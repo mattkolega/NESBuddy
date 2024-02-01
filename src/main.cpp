@@ -1,10 +1,13 @@
 #include <SDL.h>
 
 #include "Application.h"
+#include "NES.h"
 
 int main(int argc, char *argv[])
 {
     Application application;
+
+    NES nes;
 
     bool isRunning = true;
 

@@ -3,7 +3,7 @@
 #include <array>
 #include <cstdint>
 
-#include "CPU.h"
+#include "CPU/CPU.h"
 
 class NES
 {
