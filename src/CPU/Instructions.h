@@ -1,42 +1,8 @@
 #pragma once
 
-#include <bitset>
-#include <cstdint>
-#include <memory>
-
-enum class Flags : unsigned char
+namespace 6502Instructs
 {
-    carryFlag         = 0,
-    zeroFlag          = 1,
-    interruptDisable  = 2,
-    decimalMode       = 3,
-    breakCommand      = 4,
-    overflowFlag      = 6,
-    negativeFlag      = 7,
-};
-
-class CPU
-{
-public:
-    CPU();
-
-    void tick();
-private:
-    /* Registers */
-    uint16_t pc;          // Program Counter
-    uint8_t sp;           // Stack Pointer
-    uint8_t accumulator;  // Accumulator
-    uint8_t indexX;       // Index Register X
-    uint8_t indexY;       // Index Register Y
-
-    /* Flags */
-    std::bitset<8> processorStatus { 0b0010'0000 };
-
-    /**
-     * Instructions
-    */
-
-    /* Load/Store Operations */
+     /* Load/Store Operations */
     void LDA();  // Load accumulator
     void LDX();  // Load x register
     void LDY();  // Load y register
@@ -113,4 +79,4 @@ private:
     void BRK();  // Force interrupt
     void NOP();  // No operation
     void RTI();  // Return from interrupt
-};
+}
