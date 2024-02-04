@@ -16,6 +16,21 @@ enum class Flags : unsigned char
     negativeFlag      = 7,
 };
 
+enum class AddrMode
+{
+    absolute,
+    accumulator,
+    immediate,
+    indirect,
+    zeroPage,
+    absoluteX,
+    absoluteY,
+    indexIndirect,
+    indirectIndex,
+    zeroPageX,
+    zeroPageY,
+};
+
 class CPU
 {
 public:
@@ -40,11 +55,13 @@ private:
     uint8_t fetchInstruct();
     void decodeAndExecuteInstruct(uint8_t instruction);
 
+    uint8_t getValue(AddrMode addressMode);
+
     /**
      * Instructions
     */
 
-     /* Load/Store Operations */
+    /* Load/Store Operations */
     void LDA();  // Load accumulator
     void LDX();  // Load x register
     void LDY();  // Load y register
