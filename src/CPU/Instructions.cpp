@@ -4,7 +4,7 @@
  * Register Transfers
 */
 
-void CPU::TAX()
+int CPU::TAX(int clockCycles)
 {
     indexX = accumulator;
 
@@ -17,9 +17,11 @@ void CPU::TAX()
     if (isNegative) {
         processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
     }
+
+    return clockCycles;
 }
 
-void CPU::TAY()
+int CPU::TAY(int clockCycles)
 {
     indexY = accumulator;
 
@@ -32,9 +34,11 @@ void CPU::TAY()
     if (isNegative) {
         processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
     }
+
+    return clockCycles;
 }
 
-void CPU::TXA()
+int CPU::TXA(int clockCycles)
 {
     accumulator = indexX;
 
@@ -47,9 +51,11 @@ void CPU::TXA()
     if (isNegative) {
         processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
     }
+
+    return clockCycles;
 }
 
-void CPU::TYA()
+int CPU::TYA(int clockCycles)
 {
     accumulator = indexY;
 
@@ -62,43 +68,52 @@ void CPU::TYA()
     if (isNegative) {
         processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
     }   
+
+    return clockCycles;
 }
 
 /**
  * Status Flag Changes
 */
 
-void CPU::CLC()
+int CPU::CLC(int clockCycles)
 {
     processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    return clockCycles;
 }
 
-void CPU::CLD()
+int CPU::CLD(int clockCycles)
 {
     processorStatus.reset(static_cast<size_t>(Flags::decimalMode));
+    return clockCycles;
 }
 
-void CPU::CLI()
+int CPU::CLI(int clockCycles)
 {
     processorStatus.reset(static_cast<size_t>(Flags::interruptDisable));
+    return clockCycles;
 }
 
-void CPU::CLV()
+int CPU::CLV(int clockCycles)
 {
     processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
+    return clockCycles;
 }
 
-void CPU::SEC()
+int CPU::SEC(int clockCycles)
 {
     processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    return clockCycles;
 }
 
-void CPU::SED()
+int CPU::SED(int clockCycles)
 {
     processorStatus.set(static_cast<size_t>(Flags::decimalMode));
+    return clockCycles;
 }
 
-void CPU::SEI()
+int CPU::SEI(int clockCycles)
 {
     processorStatus.set(static_cast<size_t>(Flags::interruptDisable));
+    return clockCycles;
 }

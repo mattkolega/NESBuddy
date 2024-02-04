@@ -111,47 +111,47 @@ void CPU::decodeAndExecuteInstruct(uint8_t instruction)
     switch (instruction)
     {
         case 0x18:
-            CPU::CLC();
+            CPU::CLC(2);
             break;
 
         case 0x38:
-            CPU::SEC();
+            CPU::SEC(2);
             break;
 
         case 0x58:
-            CPU::CLI();
+            CPU::CLI(2);
             break;
 
         case 0x78:
-            CPU::SEI();
+            CPU::SEI(2);
             break;
 
         case 0x8A:
-            CPU::TXA();
+            CPU::TXA(2);
             break;
 
         case 0x98:
-            CPU::TYA();
+            CPU::TYA(2);
             break;
 
         case 0xA8:
-            CPU::TAY();
+            CPU::TAY(2);
             break;
 
         case 0xAA:
-            CPU::TAX();
+            CPU::TAX(2);
             break;
 
         case 0xB8:
-            CPU::CLV();
+            CPU::CLV(2);
             break;
 
         case 0xD8:
-            CPU::CLD();
+            CPU::CLD(2);
             break;
 
         case 0xF8:
-            CPU::SED();
+            CPU::SED(2);
             break;
 
         default:

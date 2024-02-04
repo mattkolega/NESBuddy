@@ -70,10 +70,10 @@ private:
     void STY();  // Store y register
 
     /* Register Transfers */
-    void TAX();  // Transfer accumulator to x
-    void TAY();  // Transfer accumulator to y
-    void TXA();  // Transfer x to accumulator
-    void TYA();  // Transfer y to accumulator
+    int TAX(int clockCycles);  // Transfer accumulator to x
+    int TAY(int clockCycles);  // Transfer accumulator to y
+    int TXA(int clockCycles);  // Transfer x to accumulator
+    int TYA(int clockCycles);  // Transfer y to accumulator
 
     /* Stack Operations */
     void PHA();  // Push accumulator
@@ -126,13 +126,13 @@ private:
     void BVS();  // Branch if overflow set
 
     /* Status Flag Changes */
-    void CLC();  // Clear carry flag
-    void CLD();  // Clear decimal mode
-    void CLI();  // Clear interrupt disable
-    void CLV();  // Clear overflow flag
-    void SEC();  // Set carry flag
-    void SED();  // Set decimal flag
-    void SEI();  // Set interrupt disable
+    int CLC(int clockCycles);  // Clear carry flag
+    int CLD(int clockCycles);  // Clear decimal mode
+    int CLI(int clockCycles);  // Clear interrupt disable
+    int CLV(int clockCycles);  // Clear overflow flag
+    int SEC(int clockCycles);  // Set carry flag
+    int SED(int clockCycles);  // Set decimal flag
+    int SEI(int clockCycles);  // Set interrupt disable
 
     /* System Functions */
     void BRK();  // Force interrupt
