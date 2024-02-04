@@ -38,7 +38,7 @@ private:
     std::bitset<8> processorStatus { 0b0010'0000 };
 private:
     uint8_t fetchInstruct();
-    void decodeAndExecuteInstruct();
+    void decodeAndExecuteInstruct(uint8_t instruction);
 
     /**
      * Instructions
