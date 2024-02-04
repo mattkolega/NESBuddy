@@ -20,7 +20,6 @@ class CPU
 {
 public:
     CPU();
-    ~CPU();
 
     void connectToNes(NES *nes);
 
