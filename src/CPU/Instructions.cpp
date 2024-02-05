@@ -46,6 +46,51 @@ int CPU::STY(uint16_t address, int clockCycles)
 }
 
 /**
+ * Stack Operations
+*/
+
+int CPU::PHA(int clockCycles)
+{
+    nes->memory[sp] = accumulator;
+    sp--;
+    return clockCycles;
+}
+
+int CPU::PHP(int clockCycles)
+{
+    nes->memory[sp] = static_cast<uint8_t>(processorStatus.to_ulong());
+    return clockCycles;
+}
+
+int CPU::PLA(int clockCycles)
+{
+    sp++;
+    accumulator = nes->memory[sp];
+    setZN(accumulator);
+    return clockCycles;
+}
+
+int CPU::PLP(int clockCycles)
+{
+    sp++;
+    processorStatus = nes->memory[sp];
+    return clockCycles;
+}
+
+int CPU::TSX(int clockCycles)
+{
+    indexX = sp;
+    setZN(indexX);
+    return clockCycles;
+}
+
+int CPU::TXS(int clockCycles)
+{
+    sp = indexX;
+    return clockCycles;
+}
+
+/**
  * Register Transfers
 */
 

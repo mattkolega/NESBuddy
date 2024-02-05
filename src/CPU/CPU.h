@@ -74,12 +74,12 @@ private:
     int TYA(int clockCycles);  // Transfer y to accumulator
 
     /* Stack Operations */
-    void PHA();  // Push accumulator
-    void PHP();  // Push processor status
-    void PLA();  // Pull accumulator
-    void PLP();  // Pull processor status
-    void TSX();  // Transfer stack pointer to x
-    void TXS();  // Transfer x to stack pointer
+    int PHA(int clockCycles);  // Push accumulator
+    int PHP(int clockCycles);  // Push processor status
+    int PLA(int clockCycles);  // Pull accumulator
+    int PLP(int clockCycles);  // Pull processor status
+    int TSX(int clockCycles);  // Transfer stack pointer to x
+    int TXS(int clockCycles);  // Transfer x to stack pointer
 
     /* Logical */
     void AND();  // Logical AND

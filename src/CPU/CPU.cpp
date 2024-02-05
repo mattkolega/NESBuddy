@@ -26,14 +26,26 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 {
     switch (instruction)
     {
+        case 0x08:
+            return CPU::PHP(3);
+
         case 0x18:
             return CPU::CLC(2);
+
+        case 0x28:
+            return CPU::PLP(4);
 
         case 0x38:
             return CPU::SEC(2);
 
+        case 0x48:
+            return CPU::PHA(3);
+
         case 0x58:
             return CPU::CLI(2);
+
+        case 0x68:
+            return CPU::PLA(4);
 
         case 0x78:
             return CPU::SEI(2);
@@ -79,6 +91,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 
         case 0x99:
             return CPU::STA(getAbsoluteYAddress(), 5);
+
+        case 0x9A:
+            return CPU::TSX(2);
 
         case 0x9D:
             return CPU::STA(getAbsoluteXAddress(), 5);
@@ -136,6 +151,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 
         case 0xB9:
             return CPU::LDA(nes->memory[getZeroPageYAddress()], 4);
+
+        case 0xBA:
+            return CPU::TSX(2);
 
         case 0xBC:
             return CPU::LDY(nes->memory[getAbsoluteXAddress()], 4);
