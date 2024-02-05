@@ -326,7 +326,11 @@ uint16_t CPU::getIndirectAddress()
     pc++;
     uint8_t byteTwo = nes->memory[pc];
     pc++;
-    return ((byteTwo << 8) | byteOne);
+    uint16_t absoluteAddress = (byteTwo << 8) | byteOne;
+    byteOne = nes->memory[absoluteAddress];
+    absoluteAddress++;
+    byteTwo = nes->memory[absoluteAddress];
+    return (byteTwo << 8) | byteOne;
 }
 
 uint8_t CPU::getZeroPageAddress()
