@@ -91,6 +91,45 @@ int CPU::TXS(int clockCycles)
 }
 
 /**
+ * Logical
+*/
+
+int CPU::AND(uint8_t value, int clockCycles)
+{
+    accumulator &= value;
+    setZN(accumulator);
+    return clockCycles;
+}
+
+int CPU::BIT(uint8_t value, int clockCycles)
+{   
+    uint8_t result = accumulator & value;
+    setZN(result);
+    
+    bool overflow = std::bitset<8>(result).test(6);
+
+    if (overflow) {
+        processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
+    }
+
+    return clockCycles;
+}
+
+int CPU::EOR(uint8_t value, int clockCycles)
+{
+    accumulator ^= value;
+    setZN(accumulator);
+    return clockCycles;
+}
+
+int CPU::ORA(uint8_t value, int clockCycles)
+{
+    accumulator |= value;
+    setZN(accumulator);
+    return clockCycles;
+}
+
+/**
  * Register Transfers
 */
 

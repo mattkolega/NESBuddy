@@ -26,23 +26,101 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 {
     switch (instruction)
     {
+        case 0x01:
+            return CPU::ORA(nes->memory[getIndexedIndirectAddress()], 6);
+
+        case 0x05:
+            return CPU::ORA(nes->memory[getZeroPageAddress()], 3);
+
         case 0x08:
             return CPU::PHP(3);
+
+        case 0x0D:
+            return CPU::ORA(nes->memory[getAbsoluteAddress()], 4);
+
+        case 0x09:
+            return CPU::ORA(getImmediateValue(), 2);
+
+        case 0x11:
+            return CPU::ORA(nes->memory[getIndirectIndexedAddress()], 5);
+
+        case 0x15:
+            return CPU::ORA(nes->memory[getZeroPageXAddress()], 4);
 
         case 0x18:
             return CPU::CLC(2);
 
+        case 0x19:
+            return CPU::ORA(nes->memory[getAbsoluteYAddress()], 4);
+        
+        case 0x1D:
+            return CPU::ORA(nes->memory[getAbsoluteXAddress()], 4);
+
+        case 0x21:
+            return CPU::AND(nes->memory[getIndexedIndirectAddress()], 6);
+
+        case 0x24:
+            return CPU::BIT(nes->memory[getZeroPageAddress()], 3);
+
+        case 0x25:
+            return CPU::AND(nes->memory[getZeroPageAddress()], 3);
+
         case 0x28:
             return CPU::PLP(4);
+
+        case 0x29:
+            return CPU::AND(getImmediateValue(), 2);
+
+        case 0x2C:
+            return CPU::BIT(nes->memory[getAbsoluteAddress()], 4);
+
+        case 0x2D:
+            return CPU::AND(nes->memory[getAbsoluteAddress()], 4);
+
+        case 0x31:
+            return CPU::AND(nes->memory[getIndirectIndexedAddress()], 5);
+
+        case 0x35:
+            return CPU::AND(nes->memory[getZeroPageXAddress()], 4);
 
         case 0x38:
             return CPU::SEC(2);
 
+        case 0x39:
+            return CPU::AND(nes->memory[getAbsoluteYAddress()], 4);
+
+        case 0x3D:
+            return CPU::AND(nes->memory[getAbsoluteXAddress()], 4);
+
+        case 0x41:
+            return CPU::EOR(nes->memory[getIndexedIndirectAddress()], 6);
+
+        case 0x45:
+            return CPU::EOR(nes->memory[getZeroPageAddress()], 3);
+
         case 0x48:
             return CPU::PHA(3);
 
+        case 0x49:
+            return CPU::EOR(getImmediateValue(), 2);
+
+        case 0x4D:
+            return CPU::EOR(nes->memory[getAbsoluteAddress()], 4);
+
+        case 0x51:
+            return CPU::EOR(nes->memory[getIndirectIndexedAddress()], 5);
+
+        case 0x55:
+            return CPU::EOR(nes->memory[getZeroPageXAddress()], 4);
+
         case 0x58:
             return CPU::CLI(2);
+
+        case 0x59:
+            return CPU::EOR(nes->memory[getAbsoluteYAddress()], 4);
+
+        case 0x5D:
+            return CPU::EOR(nes->memory[getAbsoluteXAddress()], 4);
 
         case 0x68:
             return CPU::PLA(4);

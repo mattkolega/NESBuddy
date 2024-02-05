@@ -82,10 +82,10 @@ private:
     int TXS(int clockCycles);  // Transfer x to stack pointer
 
     /* Logical */
-    void AND();  // Logical AND
-    void BIT();  // Bit test
-    void EOR();  // Exclusive OR
-    void ORA();  // Logical inclusive OR
+    int AND(uint8_t value, int clockCycles);  // Logical AND
+    int BIT(uint8_t value, int clockCycles);  // Bit test
+    int EOR(uint8_t value, int clockCycles);  // Exclusive OR
+    int ORA(uint8_t value, int clockCycles);  // Logical inclusive OR
 
     /* Arithmetic */
     void ADC();  // Add with carry
