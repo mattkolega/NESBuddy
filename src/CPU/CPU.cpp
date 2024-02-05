@@ -38,11 +38,50 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x78:
             return CPU::SEI(2);
 
+        case 0x81:
+            return CPU::STA(getIndexedIndirectAddress(), 6);
+
+        case 0x84:
+            return CPU::STY(getZeroPageAddress(), 3);
+
+        case 0x85:
+            return CPU::STA(getZeroPageAddress(), 3);
+
+        case 0x86:
+            return CPU::STX(getZeroPageAddress(), 3);
+
         case 0x8A:
             return CPU::TXA(2);
 
+        case 0x8C:
+            return CPU::STY(getAbsoluteAddress(), 4);
+
+        case 0x8D:
+            return CPU::STA(getAbsoluteAddress(), 4);
+
+        case 0x8E:
+            return CPU::STX(getAbsoluteAddress(), 4);
+
+        case 0x91:
+            return CPU::STA(getIndirectIndexedAddress(), 6);
+
+        case 0x94:
+            return CPU::STY(getZeroPageXAddress(), 4);
+
+        case 0x95:
+            return CPU::STA(getZeroPageXAddress(), 4);
+
+        case 0x96:
+            return CPU::STX(getZeroPageYAddress(), 4);
+
         case 0x98:
             return CPU::TYA(2);
+
+        case 0x99:
+            return CPU::STA(getAbsoluteYAddress(), 5);
+
+        case 0x9D:
+            return CPU::STA(getAbsoluteXAddress(), 5);
 
         case 0xA0:
             return CPU::LDY(getImmediateValue(), 2);
