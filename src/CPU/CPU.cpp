@@ -140,6 +140,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x86:
             return CPU::STX(getZeroPageAddress(), 3);
 
+        case 0x88:
+            return CPU::DEY(2);
+
         case 0x8A:
             return CPU::TXA(2);
 
@@ -239,11 +242,44 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0xBE:
             return CPU::LDX(nes->memory[getAbsoluteYAddress()], 4);
 
+        case 0xC6:
+            return CPU::DEC(getZeroPageAddress(), 5);
+
+        case 0xC8:
+            return CPU::INY(2);
+
+        case 0xCA:
+            return CPU::DEX(2);
+
+        case 0xCE:
+            return CPU::DEC(getAbsoluteAddress(), 6);
+
+        case 0xD6:
+            return CPU::DEC(getZeroPageXAddress(), 6);
+
         case 0xD8:
             return CPU::CLD(2);
 
+        case 0xDE:
+            return CPU::DEC(getAbsoluteXAddress(), 7);
+
+        case 0xE6:
+            return CPU::INC(getZeroPageAddress(), 5);
+
+        case 0xE8:
+            return CPU::INX(2);
+
+        case 0xEE:
+            return CPU::INC(getAbsoluteAddress(), 6);
+
+        case 0xF6:
+            return CPU::INC(getZeroPageXAddress(), 6);
+
         case 0xF8:
             return CPU::SED(2);
+
+        case 0xFE:
+            return CPU::INC(getAbsoluteXAddress(), 7);
 
         default:
             break;

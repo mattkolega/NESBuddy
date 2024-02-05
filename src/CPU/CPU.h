@@ -95,12 +95,12 @@ private:
     void SBC();  // Subtract with carry
 
     /* Increments and Decrements */
-    void DEC();  // Decrement memory
-    void DEX();  // Decrement x register
-    void DEY();  // Decrement y register
-    void INC();  // Increment memory
-    void INX();  // Increment x register
-    void INY();  // Increment y register
+    int DEC(uint16_t address, int clockCycles);  // Decrement memory
+    int DEX(int clockCycles);  // Decrement x register
+    int DEY(int clockCycles);  // Decrement y register
+    int INC(uint16_t address, int clockCycles);  // Increment memory
+    int INX(int clockCycles);  // Increment x register
+    int INY(int clockCycles);  // Increment y register
     
     /* Shifts */
     void ASL();  // Arithmetic shift left

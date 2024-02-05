@@ -130,6 +130,52 @@ int CPU::ORA(uint8_t value, int clockCycles)
 }
 
 /**
+ * Increments and Decrements
+*/
+
+int CPU::DEC(uint16_t address, int clockCycles)
+{
+    nes->memory[address]--;
+    setZN(nes->memory[address]);
+    return clockCycles;
+}
+
+int CPU::DEX(int clockCycles)
+{
+    indexX--;
+    setZN(indexX);
+    return clockCycles;
+}
+
+int CPU::DEY(int clockCycles)
+{
+    indexY--;
+    setZN(indexY);
+    return clockCycles;
+}
+
+int CPU::INC(uint16_t address, int clockCycles)
+{   
+    nes->memory[address]++;
+    setZN(nes->memory[address]);
+    return clockCycles;
+}
+
+int CPU::INX(int clockCycles)
+{
+    indexX++;
+    setZN(indexX);
+    return clockCycles;
+}
+
+int CPU::INY(int clockCycles)
+{
+    indexY++;
+    setZN(indexY);
+    return clockCycles;
+}
+
+/**
  * Register Transfers
 */
 
