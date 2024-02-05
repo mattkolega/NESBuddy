@@ -55,19 +55,28 @@ private:
     uint8_t fetchInstruct();
     void decodeAndExecuteInstruct(uint8_t instruction);
 
-    uint8_t getValue(AddrMode addressMode);
-
+    uint16_t getAbsoluteAddress();
+    uint16_t getAbsoluteXAddress();
+    uint16_t getAbsoluteYAddress();
+    uint8_t getImmediateValue();
+    uint16_t getIndirectAddress();
+    uint8_t getzeroPageAddress();
+    uint8_t getZeroPageXAddress();
+    uint8_t getZeroPageYAddress();
+    uint16_t getIndexedIndirectAddress();
+    uint16_t getIndirectIndexedAddress();
+    
     /**
      * Instructions
     */
 
     /* Load/Store Operations */
-    void LDA();  // Load accumulator
-    void LDX();  // Load x register
-    void LDY();  // Load y register
-    void STA();  // Store accumulator
-    void STX();  // Store x register
-    void STY();  // Store y register
+    int LDA(uint8_t value, int clockCycles);  // Load accumulator
+    int LDX(uint8_t value, int clockCycles);  // Load x register
+    int LDY(uint8_t value, int clockCycles);  // Load y register
+    int STA(uint8_t value, int clockCycles);  // Store accumulator
+    int STX(uint8_t value, int clockCycles);  // Store x register
+    int STY(uint8_t value, int clockCycles);  // Store y register
 
     /* Register Transfers */
     int TAX(int clockCycles);  // Transfer accumulator to x

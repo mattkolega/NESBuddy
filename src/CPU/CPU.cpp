@@ -22,101 +22,6 @@ uint8_t CPU::fetchInstruct()
     return instruction;
 }
 
-uint8_t CPU::getValue(AddrMode addressMode)
-{
-    switch(addressMode) 
-    {
-        case AddrMode::absolute:
-        {
-            uint8_t byteOne = nes->memory[pc];
-            pc++;
-            uint8_t byteTwo = nes->memory[pc];
-            pc++;
-            uint16_t address = (byteTwo << 8) | byteOne;
-            return nes->memory[address];
-        }
-        case AddrMode::accumulator:
-        {
-            return accumulator;
-        }
-        case AddrMode::immediate:
-        {
-            uint8_t value = pc;
-            pc++;
-            return value;
-        }
-        case AddrMode::indirect:
-        {
-            uint8_t byteOne = nes->memory[pc];
-            pc++;
-            uint8_t byteTwo = nes->memory[pc];
-            pc++;
-            uint16_t address = (byteTwo << 8) | byteOne;
-            return address;
-        }
-        case AddrMode::zeroPage:
-        {
-            uint8_t address = nes->memory[pc];
-            pc++;
-            return nes->memory[address];
-        }
-        case AddrMode::absoluteX:
-        {
-            uint8_t byteOne = nes->memory[pc];
-            pc++;
-            uint8_t byteTwo = nes->memory[pc];
-            pc++;
-            uint16_t address = ((byteTwo << 8) | byteOne) + indexX;
-            return nes->memory[address];
-        }
-        case AddrMode::absoluteY:
-        {
-            uint8_t byteOne = nes->memory[pc];
-            pc++;
-            uint8_t byteTwo = nes->memory[pc];
-            pc++;
-            uint16_t address = ((byteTwo << 8) | byteOne) + indexY;
-            return nes->memory[address];
-        }
-        case AddrMode::indexIndirect:
-        {
-            uint8_t address = (nes->memory[pc] + indexX);
-            pc++;
-            uint8_t byteOne = nes->memory[address];
-            address++;
-            uint8_t byteTwo = nes->memory[address];
-            address++;
-            uint16_t targetAddress = (byteTwo << 8) | byteOne;
-            return nes->memory[targetAddress];
-        }
-        case AddrMode::indirectIndex:
-        {
-            uint16_t address = (nes->memory[pc] + indexY);
-            pc++;
-            uint8_t byteOne = nes->memory[address];
-            address++;
-            uint8_t byteTwo = nes->memory[address];
-            address++;
-            uint16_t targetAddress = (byteTwo << 8) | byteOne;
-            return nes->memory[targetAddress];
-        }
-        case AddrMode::zeroPageX:
-        {
-            uint8_t address = nes->memory[pc] + indexX;
-            pc++;
-            return nes->memory[address];
-        }
-        case AddrMode::zeroPageY:
-        {
-            uint8_t address = nes->memory[pc] + indexY;
-            pc++;
-            return nes->memory[address];
-        }
-        default:
-            break;
-    }
-}
-
 void CPU::decodeAndExecuteInstruct(uint8_t instruction)
 {
     switch (instruction)
@@ -168,4 +73,88 @@ void CPU::decodeAndExecuteInstruct(uint8_t instruction)
         default:
             break;
     }
+}
+
+uint16_t CPU::getAbsoluteAddress()
+{
+    uint8_t byteOne = nes->memory[pc];
+    pc++;
+    uint8_t byteTwo = nes->memory[pc];
+    pc++;
+    return (byteTwo << 8) | byteOne;
+}   
+
+uint16_t CPU::getAbsoluteXAddress()
+{
+    uint8_t byteOne = nes->memory[pc];
+    pc++;
+    uint8_t byteTwo = nes->memory[pc];
+    pc++;
+    return ((byteTwo << 8) | byteOne) + indexX;
+}
+
+uint16_t CPU::getAbsoluteYAddress()
+{
+    uint8_t byteOne = nes->memory[pc];
+    pc++;
+    uint8_t byteTwo = nes->memory[pc];
+    pc++;
+    return ((byteTwo << 8) | byteOne) + indexY;
+}
+
+uint8_t CPU::getImmediateValue()
+{
+    uint8_t value = pc;
+    pc++;
+    return value;
+}
+
+uint16_t CPU::getIndirectAddress()
+{
+    uint8_t byteOne = nes->memory[pc];
+    pc++;
+    uint8_t byteTwo = nes->memory[pc];
+    pc++;
+    return ((byteTwo << 8) | byteOne);
+}
+
+uint8_t CPU::getzeroPageAddress()
+{
+    uint8_t address = nes->memory[pc];
+    pc++;
+    return address;
+}
+
+uint8_t CPU::getZeroPageXAddress()
+{
+    uint8_t address = nes->memory[pc] + indexX;
+    pc++;
+    return address;
+}
+
+uint8_t CPU::getZeroPageYAddress()
+{
+    uint8_t address = nes->memory[pc] + indexY;
+    pc++;
+    return address;
+}
+
+uint16_t CPU::getIndexedIndirectAddress()
+{
+    uint8_t address = (nes->memory[pc] + indexX) & 0xFF;
+    pc++;
+    uint8_t byteOne = nes->memory[address];
+    address++;
+    uint8_t byteTwo = nes->memory[address];
+    return (byteTwo << 8) | byteOne;
+}
+
+uint16_t CPU::getIndirectIndexedAddress()
+{
+    uint16_t address = (nes->memory[pc] + indexY);
+    pc++;
+    uint8_t byteOne = nes->memory[address];
+    address++;
+    uint8_t byteTwo = nes->memory[address];
+    return (byteTwo << 8) | byteOne;
 }
