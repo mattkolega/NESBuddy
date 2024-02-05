@@ -16,21 +16,6 @@ enum class Flags : unsigned char
     negativeFlag      = 7,
 };
 
-enum class AddrMode
-{
-    absolute,
-    accumulator,
-    immediate,
-    indirect,
-    zeroPage,
-    absoluteX,
-    absoluteY,
-    indexIndirect,
-    indirectIndex,
-    zeroPageX,
-    zeroPageY,
-};
-
 class CPU
 {
 public:
@@ -53,14 +38,18 @@ private:
     std::bitset<8> processorStatus { 0b0010'0000 };
 private:
     uint8_t fetchInstruct();
-    void decodeAndExecuteInstruct(uint8_t instruction);
+    int decodeAndExecuteInstruct(uint8_t instruction);
 
+    /* Processor Status Helper Functions */
+    void setZN(uint8_t value);
+
+    /* Addressing Mode Handlers */
     uint16_t getAbsoluteAddress();
     uint16_t getAbsoluteXAddress();
     uint16_t getAbsoluteYAddress();
     uint8_t getImmediateValue();
     uint16_t getIndirectAddress();
-    uint8_t getzeroPageAddress();
+    uint8_t getZeroPageAddress();
     uint8_t getZeroPageXAddress();
     uint8_t getZeroPageYAddress();
     uint16_t getIndexedIndirectAddress();
@@ -74,9 +63,9 @@ private:
     int LDA(uint8_t value, int clockCycles);  // Load accumulator
     int LDX(uint8_t value, int clockCycles);  // Load x register
     int LDY(uint8_t value, int clockCycles);  // Load y register
-    int STA(uint8_t value, int clockCycles);  // Store accumulator
-    int STX(uint8_t value, int clockCycles);  // Store x register
-    int STY(uint8_t value, int clockCycles);  // Store y register
+    int STA(uint16_t address, int clockCycles);  // Store accumulator
+    int STX(uint16_t address, int clockCycles);  // Store x register
+    int STY(uint16_t address, int clockCycles);  // Store y register
 
     /* Register Transfers */
     int TAX(int clockCycles);  // Transfer accumulator to x

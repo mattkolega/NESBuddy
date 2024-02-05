@@ -1,5 +1,50 @@
 #include "CPU.h"
 
+#include "../NES.h"
+
+/**
+ * Load/Store Operations
+*/
+
+int CPU::LDA(uint8_t value, int clockCycles)
+{
+    accumulator = value;
+    setZN(accumulator);
+    return clockCycles;
+}
+
+int CPU::LDX(uint8_t value, int clockCycles)
+{
+    indexX = value;
+    setZN(indexX);
+    return clockCycles;
+}
+
+int CPU::LDY(uint8_t value, int clockCycles)
+{
+    indexY = value;
+    setZN(indexY);
+    return clockCycles;
+}
+
+int CPU::STA(uint16_t address, int clockCycles)
+{
+    nes->memory[address] = accumulator;
+    return clockCycles;
+}
+
+int CPU::STX(uint16_t address, int clockCycles)
+{
+    nes->memory[address] = indexX;
+    return clockCycles;
+}
+
+int CPU::STY(uint16_t address, int clockCycles)
+{
+    nes->memory[address] = indexY;
+    return clockCycles;
+}
+
 /**
  * Register Transfers
 */
@@ -7,68 +52,28 @@
 int CPU::TAX(int clockCycles)
 {
     indexX = accumulator;
-
-    if (indexX == 0) {
-        processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
-    }
-
-    bool isNegative = std::bitset<8>(indexX).test(7);
-
-    if (isNegative) {
-        processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
-    }
-
+    setZN(indexX);
     return clockCycles;
 }
 
 int CPU::TAY(int clockCycles)
 {
     indexY = accumulator;
-
-    if (indexY == 0) {
-        processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
-    }
-
-    bool isNegative = std::bitset<8>(indexY).test(7);
-
-    if (isNegative) {
-        processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
-    }
-
+    setZN(indexY);
     return clockCycles;
 }
 
 int CPU::TXA(int clockCycles)
 {
     accumulator = indexX;
-
-    if (accumulator == 0) {
-        processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
-    }
-
-    bool isNegative = std::bitset<8>(accumulator).test(7);
-
-    if (isNegative) {
-        processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
-    }
-
+    setZN(accumulator);
     return clockCycles;
 }
 
 int CPU::TYA(int clockCycles)
 {
     accumulator = indexY;
-
-    if (accumulator == 0) {
-        processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
-    }
-
-    bool isNegative = std::bitset<8>(accumulator).test(7);
-
-    if (isNegative) {
-        processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
-    }   
-
+    setZN(accumulator);
     return clockCycles;
 }
 

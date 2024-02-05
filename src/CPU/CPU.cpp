@@ -22,53 +22,93 @@ uint8_t CPU::fetchInstruct()
     return instruction;
 }
 
-void CPU::decodeAndExecuteInstruct(uint8_t instruction)
+int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 {
     switch (instruction)
     {
         case 0x18:
-            CPU::CLC(2);
-            break;
+            return CPU::CLC(2);
 
         case 0x38:
-            CPU::SEC(2);
-            break;
+            return CPU::SEC(2);
 
         case 0x58:
-            CPU::CLI(2);
-            break;
+            return CPU::CLI(2);
 
         case 0x78:
-            CPU::SEI(2);
-            break;
+            return CPU::SEI(2);
 
         case 0x8A:
-            CPU::TXA(2);
-            break;
+            return CPU::TXA(2);
 
         case 0x98:
-            CPU::TYA(2);
-            break;
+            return CPU::TYA(2);
+
+        case 0xA0:
+            return CPU::LDY(getImmediateValue(), 2);
+
+        case 0xA1:
+            return CPU::LDA(nes->memory[getIndexedIndirectAddress()], 6);
+
+        case 0xA2:
+            return CPU::LDX(getImmediateValue(), 2);
+
+        case 0xA4:
+            return CPU::LDY(nes->memory[getZeroPageAddress()], 3);
+
+        case 0xA5:
+            return CPU::LDA(nes->memory[getZeroPageAddress()], 3);
+
+        case 0xA6:
+            return CPU::LDX(nes->memory[getZeroPageAddress()], 3);
 
         case 0xA8:
-            CPU::TAY(2);
-            break;
+            return CPU::TAY(2);
+
+        case 0xA9:
+            return CPU::LDA(getImmediateValue(), 2);
 
         case 0xAA:
-            CPU::TAX(2);
-            break;
+            return CPU::TAX(2);
+
+        case 0xAC:
+            return CPU::LDY(nes->memory[getAbsoluteAddress()], 4);
+        
+        case 0xAD:
+            return CPU::LDA(nes->memory[getAbsoluteAddress()], 4);
+
+        case 0xAE:
+            return CPU::LDX(nes->memory[getAbsoluteAddress()], 4);
+
+        case 0xB1:
+            return CPU::LDA(nes->memory[getIndirectIndexedAddress()], 5);
+
+        case 0xB4:
+            return CPU::LDY(nes->memory[getZeroPageYAddress()], 4);
+
+        case 0xB5:
+            return CPU::LDA(nes->memory[getZeroPageXAddress()], 4);
+
+        case 0xB6:
+            return CPU::LDX(nes->memory[getZeroPageYAddress()], 4);
 
         case 0xB8:
-            CPU::CLV(2);
-            break;
+            return CPU::CLV(2);
+
+        case 0xB9:
+            return CPU::LDA(nes->memory[getZeroPageYAddress()], 4);
+
+        case 0xBC:
+            return CPU::LDY(nes->memory[getAbsoluteXAddress()], 4);
+
+        case 0xBE:
+            return CPU::LDX(nes->memory[getAbsoluteYAddress()], 4);
 
         case 0xD8:
-            CPU::CLD(2);
-            break;
+            return CPU::CLD(2);
 
         case 0xF8:
-            CPU::SED(2);
-            break;
+            return CPU::SED(2);
 
         default:
             break;
@@ -118,7 +158,7 @@ uint16_t CPU::getIndirectAddress()
     return ((byteTwo << 8) | byteOne);
 }
 
-uint8_t CPU::getzeroPageAddress()
+uint8_t CPU::getZeroPageAddress()
 {
     uint8_t address = nes->memory[pc];
     pc++;
@@ -157,4 +197,17 @@ uint16_t CPU::getIndirectIndexedAddress()
     address++;
     uint8_t byteTwo = nes->memory[address];
     return (byteTwo << 8) | byteOne;
+}
+
+void CPU::setZN(uint8_t value)
+{
+    if (value == 0) {
+        processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
+    }
+
+    bool isNegative = std::bitset<8>(value).test(7);
+
+    if (isNegative) {
+        processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
+    }
 }
