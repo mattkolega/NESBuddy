@@ -176,6 +176,39 @@ int CPU::INY(int clockCycles)
 }
 
 /**
+ * Jumps and Calls
+*/
+
+int CPU::JMP(uint16_t address, int clockCycles)
+{
+    pc = address;
+    return clockCycles;
+}
+
+int CPU::JSR(uint16_t address, int clockCycles)
+{
+    pc--;
+    nes->memory[sp] = (pc >> 8) & 0xFF;
+    sp--;
+    nes->memory[sp] = pc & 0xFF;
+    sp--;
+    pc = address;
+    return clockCycles;
+}
+
+int CPU::RTS(int clockCycles)
+{
+    sp++;
+    uint8_t hiByte = nes->memory[sp];
+    sp++;
+    uint8_t loByte = nes->memory[sp];
+    uint16_t address = (hiByte << 8) | loByte; 
+    address++;
+    pc = address;
+    return clockCycles;
+}
+
+/**
  * Register Transfers
 */
 

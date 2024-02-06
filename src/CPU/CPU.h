@@ -109,9 +109,9 @@ private:
     void ROR();  // Rotate right
 
     /* Jumps and Calls */
-    void JMP();  // Jump
-    void JSR();  // Jump to subroutine
-    void RTS();  // Return from subroutine
+    int JMP(uint16_t address, int clockCycles);  // Jump
+    int JSR(uint16_t address, int clockCycles);  // Jump to subroutine
+    int RTS(int clockCycles);  // Return from subroutine
 
     /* Branches */
     void BCC();  // Branch if carry clear

@@ -56,6 +56,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x1D:
             return CPU::ORA(nes->memory[getAbsoluteXAddress()], 4);
 
+        case 0x20:
+            return CPU::JSR(getAbsoluteAddress(), 6);
+
         case 0x21:
             return CPU::AND(nes->memory[getIndexedIndirectAddress()], 6);
 
@@ -104,6 +107,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x49:
             return CPU::EOR(getImmediateValue(), 2);
 
+        case 0x4C:
+            return CPU::JMP(getAbsoluteAddress(), 3);
+
         case 0x4D:
             return CPU::EOR(nes->memory[getAbsoluteAddress()], 4);
 
@@ -122,8 +128,14 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x5D:
             return CPU::EOR(nes->memory[getAbsoluteXAddress()], 4);
 
+        case 0x60:
+            return CPU::RTS(6);
+
         case 0x68:
             return CPU::PLA(4);
+
+        case 0x6C:
+            return CPU::JMP(getIndirectAddress(), 5);
 
         case 0x78:
             return CPU::SEI(2);
