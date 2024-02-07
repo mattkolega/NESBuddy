@@ -103,10 +103,10 @@ private:
     int INY(int clockCycles);  // Increment y register
     
     /* Shifts */
-    void ASL();  // Arithmetic shift left
-    void LSR();  // Logical shift right
-    void ROL();  // Rotate left
-    void ROR();  // Rotate right
+    int ASL(uint8_t &value, int clockCycles);  // Arithmetic shift left
+    int LSR(uint8_t &value, int clockCycles);  // Logical shift right
+    int ROL(uint8_t &value, int clockCycles);  // Rotate left
+    int ROR(uint8_t &value, int clockCycles);  // Rotate right
 
     /* Jumps and Calls */
     int JMP(uint16_t address, int clockCycles);  // Jump

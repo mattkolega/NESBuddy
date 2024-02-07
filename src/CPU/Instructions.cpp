@@ -176,6 +176,72 @@ int CPU::INY(int clockCycles)
 }
 
 /**
+ * Shifts
+*/
+
+int CPU::ASL(uint8_t &value, int clockCycles)
+{
+    bool carry = processorStatus.test(static_cast<size_t>(value >> 7));
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    value <<= 1;
+
+    setZN(value);
+
+    return clockCycles;
+}
+
+int CPU::LSR(uint8_t &value, int clockCycles)
+{
+    bool carry = processorStatus.test(static_cast<size_t>(value & 0x1));
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    value >>= 1;
+
+    setZN(value);
+
+    return clockCycles;
+}
+
+int CPU::ROL(uint8_t &value, int clockCycles)
+{
+    bool carry = processorStatus.test(static_cast<size_t>(value >> 7));
+
+    value <<= 1;
+    value |= processorStatus[0];
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    setZN(value);
+
+    return clockCycles;
+}
+
+int CPU::ROR(uint8_t &value, int clockCycles)
+{
+    bool carry = processorStatus.test(static_cast<size_t>(value & 0x1));
+
+    value >>= 1;
+    value |= (processorStatus[7] << 7);
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    setZN(value);
+
+    return clockCycles;
+}
+
+/**
  * Jumps and Calls
 */
 
