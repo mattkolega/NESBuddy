@@ -275,6 +275,98 @@ int CPU::RTS(int clockCycles)
 }
 
 /**
+ * Branches
+*/
+
+int CPU::BCC(int8_t offset, int clockCycles)
+{
+    bool carryIsClear = !processorStatus.test(static_cast<size_t>(Flags::carryFlag));
+
+    if (carryIsClear) {
+        pc += offset;
+    }
+
+    return carryIsClear ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BCS(int8_t offset, int clockCycles)
+{
+    bool carryIsSet = processorStatus.test(static_cast<size_t>(Flags::carryFlag));
+
+    if (carryIsSet) {
+        pc += offset;
+    }
+
+    return carryIsSet ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BEQ(int8_t offset, int clockCycles)
+{   
+    bool isEqual = processorStatus.test(static_cast<size_t>(Flags::zeroFlag));
+
+    if (isEqual) {
+        pc += offset;
+    }
+
+    return isEqual ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BMI(int8_t offset, int clockCycles)
+{
+    bool isMinus = processorStatus.test(static_cast<size_t>(Flags::negativeFlag));
+
+    if (isMinus) {
+        pc += offset;
+    }
+
+    return isMinus ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BNE(int8_t offset, int clockCycles)
+{
+    bool isNotEqual = !processorStatus.test(static_cast<size_t>(Flags::zeroFlag));
+
+    if (isNotEqual) {
+        pc += offset;
+    }
+
+    return isNotEqual ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BPL(int8_t offset, int clockCycles)
+{   
+    bool isPositive = !processorStatus.test(static_cast<size_t>(Flags::negativeFlag));
+
+    if (isPositive) {
+        pc += offset;
+    }
+
+    return isPositive ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BVC(int8_t offset, int clockCycles)
+{
+    bool overflowIsClear = !processorStatus.test(static_cast<size_t>(Flags::overflowFlag));
+
+    if (overflowIsClear) {
+        pc += offset;
+    }
+
+    return overflowIsClear ? clockCycles+1 : clockCycles;
+}
+
+int CPU::BVS(int8_t offset, int clockCycles)
+{
+    bool overflowIsSet = processorStatus.test(static_cast<size_t>(Flags::overflowFlag));
+
+    if (overflowIsSet) {
+        pc += offset;
+    }
+
+    return overflowIsSet ? clockCycles+1 : clockCycles;
+}
+
+/**
  * Register Transfers
 */
 

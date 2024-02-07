@@ -50,6 +50,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x0E:
             return CPU::ASL(nes->memory[getAbsoluteAddress()], 6);
 
+        case 0x10:
+            return CPU::BPL(getRelativeOffset(), 2);
+
         case 0x11:
             return CPU::ORA(nes->memory[getIndirectIndexedAddress()], 5);
 
@@ -104,6 +107,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x2E:
             return CPU::ROL(nes->memory[getAbsoluteAddress()], 6);
 
+        case 0x30:
+            return CPU::BMI(getRelativeOffset(), 2);
+
         case 0x31:
             return CPU::AND(nes->memory[getIndirectIndexedAddress()], 5);
 
@@ -152,6 +158,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x4E:
             return CPU::LSR(nes->memory[getAbsoluteAddress()], 6);
 
+        case 0x50:
+            return CPU::BVC(getRelativeOffset(), 2);
+
         case 0x51:
             return CPU::EOR(nes->memory[getIndirectIndexedAddress()], 5);
 
@@ -191,6 +200,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0x6E:
             return CPU::ROR(nes->memory[getAbsoluteAddress()], 6);
 
+        case 0x70:
+            return CPU::BVS(getRelativeOffset(), 2);
+
         case 0x76:
             return CPU::ROR(nes->memory[getZeroPageXAddress()], 6);
 
@@ -226,6 +238,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 
         case 0x8E:
             return CPU::STX(getAbsoluteAddress(), 4);
+
+        case 0x90:
+            return CPU::BCC(getRelativeOffset(), 2);
 
         case 0x91:
             return CPU::STA(getIndirectIndexedAddress(), 6);
@@ -287,6 +302,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0xAE:
             return CPU::LDX(nes->memory[getAbsoluteAddress()], 4);
 
+        case 0xB0:
+            return CPU::BCS(getRelativeOffset(), 2);
+
         case 0xB1:
             return CPU::LDA(nes->memory[getIndirectIndexedAddress()], 5);
 
@@ -326,6 +344,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
         case 0xCE:
             return CPU::DEC(getAbsoluteAddress(), 6);
 
+        case 0xD0:
+            return CPU::BNE(getRelativeOffset(), 2);
+
         case 0xD6:
             return CPU::DEC(getZeroPageXAddress(), 6);
 
@@ -343,6 +364,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 
         case 0xEE:
             return CPU::INC(getAbsoluteAddress(), 6);
+
+        case 0xF0:
+            return CPU::BEQ(getRelativeOffset(), 2);
 
         case 0xF6:
             return CPU::INC(getZeroPageXAddress(), 6);
@@ -444,6 +468,13 @@ uint16_t CPU::getIndirectIndexedAddress()
     address++;
     uint8_t byteTwo = nes->memory[address];
     return (byteTwo << 8) | byteOne;
+}
+
+int8_t CPU::getRelativeOffset()
+{
+    int8_t offset = nes->memory[pc];
+    pc++;
+    return offset;
 }
 
 void CPU::setZN(uint8_t value)

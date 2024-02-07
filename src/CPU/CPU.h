@@ -54,6 +54,7 @@ private:
     uint8_t getZeroPageYAddress();
     uint16_t getIndexedIndirectAddress();
     uint16_t getIndirectIndexedAddress();
+    int8_t getRelativeOffset();
     
     /**
      * Instructions
@@ -114,14 +115,14 @@ private:
     int RTS(int clockCycles);  // Return from subroutine
 
     /* Branches */
-    void BCC();  // Branch if carry clear
-    void BCS();  // Branch is carry set
-    void BEQ();  // Branch if equal
-    void BMI();  // Branch if minus
-    void BNE();  // Branch if not equal
-    void BPL();  // Branch if positive
-    void BVC();  // Branch if overflow clear
-    void BVS();  // Branch if overflow set
+    int BCC(int8_t offset, int clockCycles);  // Branch if carry clear
+    int BCS(int8_t offset, int clockCycles);  // Branch is carry set
+    int BEQ(int8_t offset, int clockCycles);  // Branch if equal
+    int BMI(int8_t offset, int clockCycles);  // Branch if minus
+    int BNE(int8_t offset, int clockCycles);  // Branch if not equal
+    int BPL(int8_t offset, int clockCycles);  // Branch if positive
+    int BVC(int8_t offset, int clockCycles);  // Branch if overflow clear
+    int BVS(int8_t offset, int clockCycles);  // Branch if overflow set
 
     /* Status Flag Changes */
     int CLC(int clockCycles);  // Clear carry flag
