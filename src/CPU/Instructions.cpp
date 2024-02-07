@@ -265,9 +265,9 @@ int CPU::JSR(uint16_t address, int clockCycles)
 int CPU::RTS(int clockCycles)
 {
     sp++;
-    uint8_t hiByte = nes->memory[sp];
-    sp++;
     uint8_t loByte = nes->memory[sp];
+    sp++;
+    uint8_t hiByte = nes->memory[sp];
     uint16_t address = (hiByte << 8) | loByte; 
     address++;
     pc = address;
