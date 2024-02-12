@@ -89,11 +89,11 @@ private:
     int ORA(uint8_t value, int clockCycles);  // Logical inclusive OR
 
     /* Arithmetic */
-    void ADC();  // Add with carry
-    void CMP();  // Compare
-    void CPX();  // Compare x register
-    void CPY();  // Compare y register
-    void SBC();  // Subtract with carry
+    int ADC(uint8_t value, int clockCycles);  // Add with carry
+    int CMP(uint8_t value, int clockCycles);  // Compare
+    int CPX(uint8_t value, int clockCycles);  // Compare x register
+    int CPY(uint8_t value, int clockCycles);  // Compare y register
+    int SBC(uint8_t value, int clockCycles);  // Subtract with carry
 
     /* Increments and Decrements */
     int DEC(uint16_t address, int clockCycles);  // Decrement memory

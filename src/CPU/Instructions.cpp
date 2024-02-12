@@ -130,6 +130,121 @@ int CPU::ORA(uint8_t value, int clockCycles)
 }
 
 /**
+ * Arithmetic
+*/
+
+int CPU::ADC(uint8_t value, int clockCycles)
+{
+    uint8_t originalBit7 = accumulator >> 7;
+
+    uint16_t sum = accumulator + value;
+
+    bool carryIsSet = processorStatus.test(static_cast<size_t>(Flags::carryFlag));
+
+    if (carryIsSet) {
+        sum++;
+    }
+
+    if (sum > 255) {  // Set carry flag if overflow occurred
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    accumulator = sum & 0xFF;
+
+    uint8_t newBit7 = accumulator >> 7;
+
+    if (originalBit7 != newBit7) {  // Set overflow flag if bit 7 changes
+        processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
+    }
+
+    setZN(accumulator);
+
+    return clockCycles;
+}
+
+int CPU::CMP(uint8_t value, int clockCycles)
+{
+    uint8_t result = accumulator - value;
+
+    if (accumulator >= value) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+    
+    setZN(result);
+
+    return clockCycles;
+}
+
+int CPU::CPX(uint8_t value, int clockCycles)
+{
+    uint8_t result = indexX - value;
+
+    if (indexX >= value) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+    
+    setZN(result);
+    
+    return clockCycles;
+}
+
+int CPU::CPY(uint8_t value, int clockCycles)
+{
+    uint8_t result = indexY - value;
+
+    if (indexY >= value) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+    
+    setZN(result);
+
+    return clockCycles;
+}
+
+int CPU::SBC(uint8_t value, int clockCycles)
+{
+    uint8_t originalBit7 = accumulator >> 7;
+
+    int16_t result = accumulator - value;
+
+    bool carryIsClear = !processorStatus.test(static_cast<size_t>(Flags::carryFlag));
+
+    if (carryIsClear) {
+        result--;
+    }
+
+    if (result < 0) {  // Reset carry flag if overflow occurs
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    accumulator = result & 0xFF;
+
+    uint8_t newBit7 = accumulator >> 7;
+
+    if (originalBit7 != newBit7) {  // Set overflow flag if bit 7 changes
+        processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
+    }
+
+    setZN(accumulator);
+
+    return clockCycles;
+}
+
+/**
  * Increments and Decrements
 */
 
