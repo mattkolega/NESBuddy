@@ -26,6 +26,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 {
     switch (instruction)
     {
+        case 0x00:
+            return CPU::BRK(7);
+
         case 0x01:
             return CPU::ORA(nes->memory[getIndexedIndirectAddress()], 6);
 
@@ -130,6 +133,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 
         case 0x3E:
             return CPU::ROL(nes->memory[getAbsoluteXAddress()], 7);
+
+        case 0x40:
+            return CPU::RTI(6);
 
         case 0x41:
             return CPU::EOR(nes->memory[getIndexedIndirectAddress()], 6);
@@ -433,6 +439,9 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
 
         case 0xE9:
             return CPU::SBC(getImmediateValue(), 2);
+
+        case 0xEA:
+            return CPU::NOP(2);
 
         case 0xEC:
             return CPU::CPX(nes->memory[getAbsoluteAddress()], 4);

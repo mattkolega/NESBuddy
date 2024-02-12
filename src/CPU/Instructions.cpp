@@ -568,3 +568,51 @@ int CPU::SEI(int clockCycles)
     processorStatus.set(static_cast<size_t>(Flags::interruptDisable));
     return clockCycles;
 }
+
+/**
+ * System Functions
+*/
+
+int CPU::BRK(int clockCycles)
+{
+    // Push pc to stack
+    pc++;
+    nes->memory[sp] = (pc >> 8) & 0xFF;
+    sp--;
+    nes->memory[sp] = pc & 0xFF;
+    sp--;
+
+    // Push processor status to stack
+    nes->memory[sp] = static_cast<uint8_t>(processorStatus.to_ulong());
+
+    sp--;
+    processorStatus.set(static_cast<uint8_t>(Flags::breakCommand));
+
+    uint8_t lowByte = nes->memory[0xFFFE];
+    uint8_t highByte = nes->memory[0xFFFF];
+
+    pc = (highByte << 8) | lowByte; 
+
+    return clockCycles;
+}
+
+int CPU::NOP(int clockCycles)
+{
+    return clockCycles;
+}
+
+int CPU::RTI(int clockCycles)
+{
+    // Get processor status from stack
+    sp++;
+    processorStatus = nes->memory[sp];
+
+    // Get pc from stack
+    sp++;
+    uint8_t lowByte = nes->memory[sp];
+    sp++;
+    uint8_t highByte = nes->memory[sp];
+    pc = (highByte << 8) | lowByte;
+
+    return clockCycles;
+}

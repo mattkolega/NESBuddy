@@ -134,7 +134,7 @@ private:
     int SEI(int clockCycles);  // Set interrupt disable
 
     /* System Functions */
-    void BRK();  // Force interrupt
-    void NOP();  // No operation
-    void RTI();  // Return from interrupt
+    int BRK(int clockCycles);  // Force interrupt
+    int NOP(int clockCycles);  // No operation
+    int RTI(int clockCycles);  // Return from interrupt
 };
