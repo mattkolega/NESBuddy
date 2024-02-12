@@ -571,11 +571,15 @@ void CPU::setZN(uint8_t value)
 {
     if (value == 0) {
         processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::zeroFlag));
     }
 
     bool isNegative = std::bitset<8>(value).test(7);
 
     if (isNegative) {
         processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::negativeFlag));
     }
 }

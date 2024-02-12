@@ -110,6 +110,8 @@ int CPU::BIT(uint8_t value, int clockCycles)
 
     if (overflow) {
         processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
     }
 
     return clockCycles;
@@ -300,6 +302,8 @@ int CPU::ASL(uint8_t &value, int clockCycles)
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
     }
 
     value <<= 1;
@@ -315,6 +319,8 @@ int CPU::LSR(uint8_t &value, int clockCycles)
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
     }
 
     value >>= 1;
@@ -333,6 +339,8 @@ int CPU::ROL(uint8_t &value, int clockCycles)
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
     }
 
     setZN(value);
@@ -349,6 +357,8 @@ int CPU::ROR(uint8_t &value, int clockCycles)
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
     }
 
     setZN(value);
