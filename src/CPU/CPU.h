@@ -3,8 +3,6 @@
 #include <bitset>
 #include <cstdint>
 
-class NES;
-
 enum class Flags : unsigned char
 {
     carryFlag         = 0,
@@ -16,14 +14,20 @@ enum class Flags : unsigned char
     negativeFlag      = 7,
 };
 
+class NES;
+struct CPUState;
+
 class CPU
 {
 public:
     CPU();
+    CPU(CPUState &initialState);
 
     void connectToNes(NES *nes);
 
     void tick();
+
+    CPUState getState();
 private:
     NES *nes { nullptr };
 

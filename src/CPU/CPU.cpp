@@ -1,8 +1,19 @@
 #include "CPU.h"
 
 #include "../NES.h"
+#include "State.h"
+#include <bitset>
 
 CPU::CPU() {}
+
+CPU::CPU(CPUState &initialState) {
+    pc = initialState.pc;
+    sp = initialState.sp;
+    accumulator = initialState.accumulator;
+    indexX = initialState.indexX;
+    indexY = initialState.indexY;
+    processorStatus = initialState.processorStatus;
+}
 
 void CPU::connectToNes(NES *nes)
 {
@@ -13,6 +24,20 @@ void CPU::tick()
 {
     uint8_t instruction = fetchInstruct();
     decodeAndExecuteInstruct(instruction);
+}
+
+CPUState CPU::getState()
+{
+    CPUState currentState;
+
+    currentState.pc = pc;
+    currentState.sp = sp;
+    currentState.accumulator = accumulator;
+    currentState.indexX = indexX;
+    currentState.indexY = indexY;
+    currentState.processorStatus = static_cast<uint8_t>(processorStatus.to_ulong());
+
+    return currentState;
 }
 
 uint8_t CPU::fetchInstruct()
