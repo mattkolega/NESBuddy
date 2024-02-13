@@ -1,6 +1,6 @@
 #include "NES.h"
 
-#include "CPU/State.h";
+#include "CPU/State.h"
 
 NES::NES()
 {

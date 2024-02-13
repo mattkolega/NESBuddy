@@ -502,7 +502,7 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
             return CPU::INC(getAbsoluteXAddress(), 7);
 
         default:
-            break;
+            return 0;
     }
 }
 
