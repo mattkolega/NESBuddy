@@ -9,7 +9,7 @@ set_languages("c++20")
 add_requires(
     "catch2",
     "libsdl",
-    "simdjson"
+    "nlohmann_json"
 )
 
 target("nesbuddy")
@@ -21,4 +21,4 @@ target("cputest")
     set_kind("binary")
     set_default(false)
     add_files("test/test_CPU.cpp")
-    add_packages("catch2", "simdjson")
+    add_packages("catch2", "nlohmann_json")
