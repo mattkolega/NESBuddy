@@ -17,7 +17,7 @@ CPU::CPU(CPUState &initialState) {
 
 void CPU::connectToNes(NES *nes)
 {
-    nes = nes;
+    this->nes = nes;
 }
 
 void CPU::tick()

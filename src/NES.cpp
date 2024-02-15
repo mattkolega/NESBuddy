@@ -22,6 +22,11 @@ void NES::setMemoryValue(uint16_t address, uint8_t value)
     memory[address] = value;
 }
 
+void NES::tickCPU()
+{
+    cpu.tick();
+}
+
 CPUState NES::getCPUState()
 {
     return cpu.getState();
