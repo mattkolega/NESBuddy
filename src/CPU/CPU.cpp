@@ -2,7 +2,6 @@
 
 #include "../NES.h"
 #include "State.h"
-#include <bitset>
 
 CPU::CPU() {}
 
@@ -316,7 +315,7 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
             return CPU::STA(getAbsoluteYAddress(), 5);
 
         case 0x9A:
-            return CPU::TSX(2);
+            return CPU::TXS(2);
 
         case 0x9D:
             return CPU::STA(getAbsoluteXAddress(), 5);
@@ -364,7 +363,7 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
             return CPU::LDA(nes->memory[getIndirectIndexedAddress()], 5);
 
         case 0xB4:
-            return CPU::LDY(nes->memory[getZeroPageYAddress()], 4);
+            return CPU::LDY(nes->memory[getZeroPageXAddress()], 4);
 
         case 0xB5:
             return CPU::LDA(nes->memory[getZeroPageXAddress()], 4);
@@ -376,13 +375,16 @@ int CPU::decodeAndExecuteInstruct(uint8_t instruction)
             return CPU::CLV(2);
 
         case 0xB9:
-            return CPU::LDA(nes->memory[getZeroPageYAddress()], 4);
+            return CPU::LDA(nes->memory[getAbsoluteYAddress()], 4);
 
         case 0xBA:
             return CPU::TSX(2);
 
         case 0xBC:
             return CPU::LDY(nes->memory[getAbsoluteXAddress()], 4);
+
+        case 0xBD:
+            return CPU::LDA(nes->memory[getAbsoluteXAddress()], 4);
 
         case 0xBE:
             return CPU::LDX(nes->memory[getAbsoluteYAddress()], 4);
@@ -535,7 +537,7 @@ uint16_t CPU::getAbsoluteYAddress()
 
 uint8_t CPU::getImmediateValue()
 {
-    uint8_t value = pc;
+    uint8_t value = nes->memory[pc];
     pc++;
     return value;
 }
@@ -546,9 +548,16 @@ uint16_t CPU::getIndirectAddress()
     pc++;
     uint8_t byteTwo = nes->memory[pc];
     pc++;
+
     uint16_t absoluteAddress = (byteTwo << 8) | byteOne;
     byteOne = nes->memory[absoluteAddress];
-    absoluteAddress++;
+
+    if ((absoluteAddress & 0x00FF) == 0xFF) {
+        absoluteAddress &= 0xFF00;
+    } else {
+        absoluteAddress++;
+    }
+    
     byteTwo = nes->memory[absoluteAddress];
     return (byteTwo << 8) | byteOne;
 }
@@ -586,11 +595,12 @@ uint16_t CPU::getIndexedIndirectAddress()
 
 uint16_t CPU::getIndirectIndexedAddress()
 {
-    uint16_t address = (nes->memory[pc] + indexY);
+    uint8_t address = nes->memory[pc];
     pc++;
-    uint8_t byteOne = nes->memory[address];
+    uint8_t byteOne = nes->memory[address] + indexY;
+    int carry  = ((nes->memory[address] + indexY) > 255) ? 1 : 0; 
     address++;
-    uint8_t byteTwo = nes->memory[address];
+    uint8_t byteTwo = nes->memory[address] + carry;
     return (byteTwo << 8) | byteOne;
 }
 
@@ -609,7 +619,7 @@ void CPU::setZN(uint8_t value)
         processorStatus.reset(static_cast<size_t>(Flags::zeroFlag));
     }
 
-    bool isNegative = std::bitset<8>(value).test(7);
+    bool isNegative = (value >> 7) == 1;
 
     if (isNegative) {
         processorStatus.set(static_cast<size_t>(Flags::negativeFlag));

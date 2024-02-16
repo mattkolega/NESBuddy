@@ -51,21 +51,24 @@ int CPU::STY(uint16_t address, int clockCycles)
 
 int CPU::PHA(int clockCycles)
 {
-    nes->memory[sp] = accumulator;
+    nes->memory[0x100 + sp] = accumulator;
     sp--;
     return clockCycles;
 }
 
 int CPU::PHP(int clockCycles)
 {
-    nes->memory[sp] = static_cast<uint8_t>(processorStatus.to_ulong());
+    processorStatus.set(static_cast<uint8_t>(Flags::breakCommand));
+    nes->memory[0x100 + sp] = static_cast<uint8_t>(processorStatus.to_ulong());
+    sp--;
+    processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     return clockCycles;
 }
 
 int CPU::PLA(int clockCycles)
 {
     sp++;
-    accumulator = nes->memory[sp];
+    accumulator = nes->memory[0x100 + sp];
     setZN(accumulator);
     return clockCycles;
 }
@@ -73,7 +76,8 @@ int CPU::PLA(int clockCycles)
 int CPU::PLP(int clockCycles)
 {
     sp++;
-    processorStatus = nes->memory[sp];
+    processorStatus = nes->memory[0x100 + sp] | 0x20;
+    processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     return clockCycles;
 }
 
@@ -106,12 +110,26 @@ int CPU::BIT(uint8_t value, int clockCycles)
     uint8_t result = accumulator & value;
     setZN(result);
     
-    bool overflow = std::bitset<8>(result).test(6);
+    bool overflow = std::bitset<8>(value).test(6);
 
     if (overflow) {
         processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
     } else {
         processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
+    }
+
+    if (result == 0) {
+        processorStatus.set(static_cast<size_t>(Flags::zeroFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::zeroFlag));
+    }
+
+    bool isNegative = (value >> 7) == 1;
+
+    if (isNegative) {
+        processorStatus.set(static_cast<size_t>(Flags::negativeFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::negativeFlag));
     }
 
     return clockCycles;
@@ -137,8 +155,6 @@ int CPU::ORA(uint8_t value, int clockCycles)
 
 int CPU::ADC(uint8_t value, int clockCycles)
 {
-    uint8_t originalBit7 = accumulator >> 7;
-
     uint16_t sum = accumulator + value;
 
     bool carryIsSet = processorStatus.test(static_cast<size_t>(Flags::carryFlag));
@@ -153,15 +169,15 @@ int CPU::ADC(uint8_t value, int clockCycles)
         processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
     }
 
-    accumulator = sum & 0xFF;
+    bool overflow = ~((accumulator ^ value) & 0x80) & ((accumulator ^ sum) & 0x80);
 
-    uint8_t newBit7 = accumulator >> 7;
-
-    if (originalBit7 != newBit7) {  // Set overflow flag if bit 7 changes
+    if (overflow) {  // Set overflow flag if twos complement overflow
         processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
     } else {
         processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
     }
+
+    accumulator = sum & 0xFF;
 
     setZN(accumulator);
 
@@ -215,8 +231,6 @@ int CPU::CPY(uint8_t value, int clockCycles)
 
 int CPU::SBC(uint8_t value, int clockCycles)
 {
-    uint8_t originalBit7 = accumulator >> 7;
-
     int16_t result = accumulator - value;
 
     bool carryIsClear = !processorStatus.test(static_cast<size_t>(Flags::carryFlag));
@@ -231,15 +245,15 @@ int CPU::SBC(uint8_t value, int clockCycles)
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
     }
 
-    accumulator = result & 0xFF;
+    bool overflow = ((accumulator ^ value) & 0x80) & ((accumulator ^ (result & 0xFF)) & 0x80);
 
-    uint8_t newBit7 = accumulator >> 7;
-
-    if (originalBit7 != newBit7) {  // Set overflow flag if bit 7 changes
+    if (overflow) {  // Set overflow flag if twos complement overflow
         processorStatus.set(static_cast<size_t>(Flags::overflowFlag));
     } else {
         processorStatus.reset(static_cast<size_t>(Flags::overflowFlag));
     }
+
+    accumulator = result & 0xFF;
 
     setZN(accumulator);
 
@@ -298,7 +312,7 @@ int CPU::INY(int clockCycles)
 
 int CPU::ASL(uint8_t &value, int clockCycles)
 {
-    bool carry = processorStatus.test(static_cast<size_t>(value >> 7));
+    bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
@@ -315,7 +329,7 @@ int CPU::ASL(uint8_t &value, int clockCycles)
 
 int CPU::LSR(uint8_t &value, int clockCycles)
 {
-    bool carry = processorStatus.test(static_cast<size_t>(value & 0x1));
+    bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
@@ -332,7 +346,7 @@ int CPU::LSR(uint8_t &value, int clockCycles)
 
 int CPU::ROL(uint8_t &value, int clockCycles)
 {
-    bool carry = processorStatus.test(static_cast<size_t>(value >> 7));
+    bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
     value <<= 1;
     value |= processorStatus[0];
@@ -350,10 +364,10 @@ int CPU::ROL(uint8_t &value, int clockCycles)
 
 int CPU::ROR(uint8_t &value, int clockCycles)
 {
-    bool carry = processorStatus.test(static_cast<size_t>(value & 0x1));
+    bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
     value >>= 1;
-    value |= (processorStatus[7] << 7);
+    value |= (processorStatus[0] << 7);
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
@@ -379,9 +393,9 @@ int CPU::JMP(uint16_t address, int clockCycles)
 int CPU::JSR(uint16_t address, int clockCycles)
 {
     pc--;
-    nes->memory[sp] = (pc >> 8) & 0xFF;
+    nes->memory[0x100 + sp] = (pc >> 8) & 0xFF;
     sp--;
-    nes->memory[sp] = pc & 0xFF;
+    nes->memory[0x100 + sp] = pc & 0xFF;
     sp--;
     pc = address;
     return clockCycles;
@@ -390,9 +404,9 @@ int CPU::JSR(uint16_t address, int clockCycles)
 int CPU::RTS(int clockCycles)
 {
     sp++;
-    uint8_t loByte = nes->memory[sp];
+    uint8_t loByte = nes->memory[0x100 + sp];
     sp++;
-    uint8_t hiByte = nes->memory[sp];
+    uint8_t hiByte = nes->memory[0x100 + sp];
     uint16_t address = (hiByte << 8) | loByte; 
     address++;
     pc = address;
@@ -577,17 +591,20 @@ int CPU::BRK(int clockCycles)
 {
     // Push pc to stack
     pc++;
-    nes->memory[sp] = (pc >> 8) & 0xFF;
+    nes->memory[0x100 + sp] = (pc >> 8) & 0xFF;
     sp--;
-    nes->memory[sp] = pc & 0xFF;
+    nes->memory[0x100 + sp] = pc & 0xFF;
     sp--;
 
-    // Push processor status to stack
-    nes->memory[sp] = static_cast<uint8_t>(processorStatus.to_ulong());
-
-    sp--;
     processorStatus.set(static_cast<uint8_t>(Flags::breakCommand));
 
+    // Push processor status to stack
+    nes->memory[0x100 + sp] = static_cast<uint8_t>(processorStatus.to_ulong());
+    sp--;
+
+    processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
+    processorStatus.set(static_cast<uint8_t>(Flags::interruptDisable));
+    
     uint8_t lowByte = nes->memory[0xFFFE];
     uint8_t highByte = nes->memory[0xFFFF];
 
@@ -605,13 +622,14 @@ int CPU::RTI(int clockCycles)
 {
     // Get processor status from stack
     sp++;
-    processorStatus = nes->memory[sp];
+    processorStatus = nes->memory[0x100 + sp] | 0x20;
+    processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
 
     // Get pc from stack
     sp++;
-    uint8_t lowByte = nes->memory[sp];
+    uint8_t lowByte = nes->memory[0x100 + sp];
     sp++;
-    uint8_t highByte = nes->memory[sp];
+    uint8_t highByte = nes->memory[0x100 + sp];
     pc = (highByte << 8) | lowByte;
 
     return clockCycles;
