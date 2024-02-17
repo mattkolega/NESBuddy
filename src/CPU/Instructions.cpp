@@ -345,7 +345,7 @@ int CPU::ROL(uint8_t &value, int clockCycles)
     bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
     value <<= 1;
-    value |= processorStatus[0];
+    value |= processorStatus[static_cast<uint8_t>(Flags::carryFlag)];
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
@@ -363,7 +363,7 @@ int CPU::ROR(uint8_t &value, int clockCycles)
     bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
     value >>= 1;
-    value |= (processorStatus[0] << 7);
+    value |= (processorStatus[static_cast<uint8_t>(Flags::carryFlag)] << 7);
 
     if (carry) {
         processorStatus.set(static_cast<size_t>(Flags::carryFlag));
