@@ -627,3 +627,15 @@ void CPU::setZN(uint8_t value)
         processorStatus.reset(static_cast<size_t>(Flags::negativeFlag));
     }
 }
+
+void CPU::pushToStack(uint8_t value)
+{
+    nes->setMemoryValue(0x100 + sp, value);
+    sp--;
+}
+
+uint8_t CPU::popFromStack()
+{
+    sp++;
+    return nes->getMemoryValue(0x100 + sp);
+}

@@ -40,7 +40,8 @@ private:
 
     /* Flags */
     std::bitset<8> processorStatus { 0b0010'0000 };
-private:
+
+    /* Fetch-Decode-Execute */
     uint8_t fetchInstruct();
     int decodeAndExecuteInstruct(uint8_t instruction);
 
@@ -59,6 +60,10 @@ private:
     uint16_t getIndexedIndirectAddress();
     uint16_t getIndirectIndexedAddress();
     int8_t getRelativeOffset();
+
+    /* Stack Helpers */
+    void pushToStack(uint8_t value);
+    uint8_t popFromStack();
     
     /**
      * Instructions

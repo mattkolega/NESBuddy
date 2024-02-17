@@ -51,32 +51,28 @@ int CPU::STY(uint16_t address, int clockCycles)
 
 int CPU::PHA(int clockCycles)
 {
-    nes->memory[0x100 + sp] = accumulator;
-    sp--;
+    pushToStack(accumulator);
     return clockCycles;
 }
 
 int CPU::PHP(int clockCycles)
 {
     processorStatus.set(static_cast<uint8_t>(Flags::breakCommand));
-    nes->memory[0x100 + sp] = static_cast<uint8_t>(processorStatus.to_ulong());
-    sp--;
+    pushToStack(static_cast<uint8_t>(processorStatus.to_ulong()));
     processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     return clockCycles;
 }
 
 int CPU::PLA(int clockCycles)
 {
-    sp++;
-    accumulator = nes->memory[0x100 + sp];
+    accumulator = popFromStack();
     setZN(accumulator);
     return clockCycles;
 }
 
 int CPU::PLP(int clockCycles)
 {
-    sp++;
-    processorStatus = nes->memory[0x100 + sp] | 0x20;
+    processorStatus = popFromStack() | 0x20;
     processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     return clockCycles;
 }
@@ -393,20 +389,16 @@ int CPU::JMP(uint16_t address, int clockCycles)
 int CPU::JSR(uint16_t address, int clockCycles)
 {
     pc--;
-    nes->memory[0x100 + sp] = (pc >> 8) & 0xFF;
-    sp--;
-    nes->memory[0x100 + sp] = pc & 0xFF;
-    sp--;
+    pushToStack((pc >> 8) & 0xFF);
+    pushToStack(pc & 0xFF);
     pc = address;
     return clockCycles;
 }
 
 int CPU::RTS(int clockCycles)
 {
-    sp++;
-    uint8_t loByte = nes->memory[0x100 + sp];
-    sp++;
-    uint8_t hiByte = nes->memory[0x100 + sp];
+    uint8_t loByte = popFromStack();
+    uint8_t hiByte = popFromStack();
     uint16_t address = (hiByte << 8) | loByte; 
     address++;
     pc = address;
@@ -589,18 +581,13 @@ int CPU::SEI(int clockCycles)
 
 int CPU::BRK(int clockCycles)
 {
-    // Push pc to stack
     pc++;
-    nes->memory[0x100 + sp] = (pc >> 8) & 0xFF;
-    sp--;
-    nes->memory[0x100 + sp] = pc & 0xFF;
-    sp--;
+    pushToStack((pc >> 8) & 0xFF);
+    pushToStack(pc & 0xFF);
 
     processorStatus.set(static_cast<uint8_t>(Flags::breakCommand));
 
-    // Push processor status to stack
-    nes->memory[0x100 + sp] = static_cast<uint8_t>(processorStatus.to_ulong());
-    sp--;
+    pushToStack(static_cast<uint8_t>(processorStatus.to_ulong()));
 
     processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     processorStatus.set(static_cast<uint8_t>(Flags::interruptDisable));
@@ -620,16 +607,12 @@ int CPU::NOP(int clockCycles)
 
 int CPU::RTI(int clockCycles)
 {
-    // Get processor status from stack
-    sp++;
-    processorStatus = nes->memory[0x100 + sp] | 0x20;
+    processorStatus = popFromStack() | 0x20;
     processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
 
-    // Get pc from stack
-    sp++;
-    uint8_t lowByte = nes->memory[0x100 + sp];
-    sp++;
-    uint8_t highByte = nes->memory[0x100 + sp];
+    uint8_t lowByte = popFromStack();
+    uint8_t highByte = popFromStack();
+    
     pc = (highByte << 8) | lowByte;
 
     return clockCycles;
