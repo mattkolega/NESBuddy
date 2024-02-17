@@ -45,9 +45,6 @@ private:
     uint8_t fetchInstruct();
     int decodeAndExecuteInstruct(uint8_t instruction);
 
-    /* Processor Status Helper Functions */
-    void setZN(uint8_t value);
-
     /* Addressing Mode Handlers */
     uint16_t getAbsoluteAddress();
     uint16_t getAbsoluteXAddress();
@@ -60,6 +57,9 @@ private:
     uint16_t getIndexedIndirectAddress();
     uint16_t getIndirectIndexedAddress();
     int8_t getRelativeOffset();
+
+    /* Processor Status Helper Functions */
+    void setZN(uint8_t value);
 
     /* Stack Helpers */
     void pushToStack(uint8_t value);
