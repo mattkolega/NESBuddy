@@ -1,21 +1,22 @@
 set_project("NESBuddy")
 set_version("0.1.0")
 
-add_rules("mode.debug", "mode.release")
-
 set_languages("c++20")
+
+add_rules("mode.debug", "mode.release")
 
 -- Dependencies --
 add_requires(
     "catch2",
     "libsdl",
+    "nativefiledialog-extended",
     "nlohmann_json"
 )
 
 target("nesbuddy")
     set_kind("binary")
     add_files("src/**.cpp")
-    add_packages("libsdl")
+    add_packages("libsdl", "nativefiledialog-extended")
 
 target("cputest")
     set_kind("binary")
