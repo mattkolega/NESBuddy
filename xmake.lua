@@ -17,6 +17,9 @@ target("nesbuddy")
     set_kind("binary")
     add_files("src/**.cpp")
     add_packages("libsdl", "nativefiledialog-extended")
+    if is_mode("debug") then
+        add_ldflags("/subsystem:console")  -- Needed for stdout and stderr to console 
+    end
 
 target("cputest")
     set_kind("binary")
