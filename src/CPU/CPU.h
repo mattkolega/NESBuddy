@@ -24,6 +24,7 @@ public:
     CPU(CPUState &initialState);
 
     void connectToNes(NES *nes);
+    void setToPowerUpState();
 
     void tick();
 

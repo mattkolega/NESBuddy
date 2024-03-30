@@ -19,6 +19,16 @@ void CPU::connectToNes(NES *nes)
     this->nes = nes;
 }
 
+void CPU::setToPowerUpState()
+{
+    pc = (nes->getMemoryValue(0xFFFD) << 8) | nes->getMemoryValue(0xFFFC);
+    accumulator = 0;
+    indexX = 0;
+    indexY = 0;
+    sp = 0xFD;
+    processorStatus = 0x34;
+}
+
 void CPU::tick()
 {
     uint8_t instruction = fetchInstruct();
