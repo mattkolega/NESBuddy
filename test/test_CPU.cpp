@@ -35,7 +35,7 @@ void testOpcode(std::string_view testFileName)
         // Set memory to initial values
         // ramItem[0] is the address and ramItem[1] is the value
         for (auto& ramItem : test["initial"]["ram"]) {
-            nes.setMemoryValue(ramItem[address], ramItem[value]);
+            nes.memoryWrite(ramItem[address], ramItem[value]);
         }
 
         // Run CPU for the given instruction
@@ -61,14 +61,14 @@ void testOpcode(std::string_view testFileName)
         // Check if memory contents equal expected values
         for (auto& ramItem : test["final"]["ram"]) {
             expectedMem << "\tAddr: " << ramItem[address] << " Val: " << ramItem[value] << "\n";
-            actualMem << "\tAddr: " << ramItem[address] << " Val: " << +nes.getMemoryValue(ramItem[address]) << "\n";
-            if (ramItem[value] != nes.getMemoryValue(ramItem[address])) {
+            actualMem << "\tAddr: " << ramItem[address] << " Val: " << +nes.memoryRead(ramItem[address]) << "\n";
+            if (ramItem[value] != nes.memoryRead(ramItem[address])) {
                 ramMatch = false;
             }
         }
 
         // Info statements will only be displayed if an assertion fails
-        INFO("Operation: " + static_cast<std::string>(test["name"]));
+        INFO("Operation: " + test["name"].dump());
         INFO("Expected CPU State:\n\t" + expectedCPUState.toString() + "\nActual CPU State:\n\t" + endCPUState.toString());
         INFO("Expected Memory State:\n" + expectedMem.str() + "Actual Memory State:\n" + actualMem.str());
 

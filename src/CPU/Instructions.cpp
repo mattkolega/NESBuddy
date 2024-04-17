@@ -29,19 +29,19 @@ int CPU::LDY(uint8_t value, int clockCycles)
 
 int CPU::STA(uint16_t address, int clockCycles)
 {
-    nes->memory[address] = accumulator;
+    nes->memoryWrite(address, accumulator);
     return clockCycles;
 }
 
 int CPU::STX(uint16_t address, int clockCycles)
 {
-    nes->memory[address] = indexX;
+    nes->memoryWrite(address, indexX);
     return clockCycles;
 }
 
 int CPU::STY(uint16_t address, int clockCycles)
 {
-    nes->memory[address] = indexY;
+    nes->memoryWrite(address, indexY);
     return clockCycles;
 }
 
@@ -262,8 +262,8 @@ int CPU::SBC(uint8_t value, int clockCycles)
 
 int CPU::DEC(uint16_t address, int clockCycles)
 {
-    nes->memory[address]--;
-    setZN(nes->memory[address]);
+    nes->memoryWrite(address, nes->memoryRead(address)-1);
+    setZN(nes->memoryRead(address));
     return clockCycles;
 }
 
@@ -283,8 +283,8 @@ int CPU::DEY(int clockCycles)
 
 int CPU::INC(uint16_t address, int clockCycles)
 {   
-    nes->memory[address]++;
-    setZN(nes->memory[address]);
+    nes->memoryWrite(address, nes->memoryRead(address)+1);
+    setZN(nes->memoryRead(address));
     return clockCycles;
 }
 
@@ -306,8 +306,10 @@ int CPU::INY(int clockCycles)
  * Shifts
 */
 
-int CPU::ASL(uint8_t &value, int clockCycles)
+int CPU::ASL(uint16_t address, int clockCycles)
 {
+    uint8_t value = nes->memoryRead(address);
+
     bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
     if (carry) {
@@ -320,11 +322,32 @@ int CPU::ASL(uint8_t &value, int clockCycles)
 
     setZN(value);
 
+    nes->memoryWrite(address, value);
+
     return clockCycles;
 }
 
-int CPU::LSR(uint8_t &value, int clockCycles)
+int CPU::ASL_a(int clockCycles)
 {
+    bool carry = (accumulator >> 7) == 1;  // Test bit 7 of input value
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    accumulator <<= 1;
+
+    setZN(accumulator);
+
+    return clockCycles;
+}
+
+int CPU::LSR(uint16_t address, int clockCycles)
+{
+    uint8_t value = nes->memoryRead(address);
+
     bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
     if (carry) {
@@ -337,11 +360,32 @@ int CPU::LSR(uint8_t &value, int clockCycles)
 
     setZN(value);
 
+    nes->memoryWrite(address, value);
+
     return clockCycles;
 }
 
-int CPU::ROL(uint8_t &value, int clockCycles)
+int CPU::LSR_a(int clockCycles)
 {
+    bool carry = (accumulator & 0x01) == 1;  // Test bit 0 of input value
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    accumulator >>= 1;
+
+    setZN(accumulator);
+
+    return clockCycles;
+}
+
+int CPU::ROL(uint16_t address, int clockCycles)
+{
+    uint8_t value = nes->memoryRead(address);
+    
     bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
     value <<= 1;
@@ -355,11 +399,33 @@ int CPU::ROL(uint8_t &value, int clockCycles)
 
     setZN(value);
 
+    nes->memoryWrite(address, value);
+
     return clockCycles;
 }
 
-int CPU::ROR(uint8_t &value, int clockCycles)
+int CPU::ROL_a(int clockCycles)
+{   
+    bool carry = (accumulator >> 7) == 1;  // Test bit 7 of input value
+
+    accumulator <<= 1;
+    accumulator |= processorStatus[static_cast<uint8_t>(Flags::carryFlag)];
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    setZN(accumulator);
+
+    return clockCycles;
+}
+
+int CPU::ROR(uint16_t address, int clockCycles)
 {
+    uint8_t value = nes->memoryRead(address);
+    
     bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
     value >>= 1;
@@ -372,6 +438,26 @@ int CPU::ROR(uint8_t &value, int clockCycles)
     }
 
     setZN(value);
+
+    nes->memoryWrite(address, value);
+
+    return clockCycles;
+}
+
+int CPU::ROR_a(int clockCycles)
+{
+    bool carry = (accumulator & 0x01) == 1;  // Test bit 0 of input value
+
+    accumulator >>= 1;
+    accumulator |= (processorStatus[static_cast<uint8_t>(Flags::carryFlag)] << 7);
+
+    if (carry) {
+        processorStatus.set(static_cast<size_t>(Flags::carryFlag));
+    } else {
+        processorStatus.reset(static_cast<size_t>(Flags::carryFlag));
+    }
+
+    setZN(accumulator);
 
     return clockCycles;
 }
@@ -592,8 +678,8 @@ int CPU::BRK(int clockCycles)
     processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     processorStatus.set(static_cast<uint8_t>(Flags::interruptDisable));
     
-    uint8_t lowByte = nes->memory[0xFFFE];
-    uint8_t highByte = nes->memory[0xFFFF];
+    uint8_t lowByte = nes->memoryRead(0xFFFE);
+    uint8_t highByte = nes->memoryRead(0xFFFF);
 
     pc = (highByte << 8) | lowByte; 
 

@@ -114,10 +114,14 @@ private:
     int INY(int clockCycles);  // Increment y register
     
     /* Shifts */
-    int ASL(uint8_t &value, int clockCycles);  // Arithmetic shift left
-    int LSR(uint8_t &value, int clockCycles);  // Logical shift right
-    int ROL(uint8_t &value, int clockCycles);  // Rotate left
-    int ROR(uint8_t &value, int clockCycles);  // Rotate right
+    int ASL(uint16_t address, int clockCycles);  // Arithmetic shift left
+    int ASL_a(int clockCycles);  // Same as above but only grabs value from accumulator
+    int LSR(uint16_t address, int clockCycles);  // Logical shift right
+    int LSR_a(int clockCycles);  // Same as above but only grabs value from accumulator
+    int ROL(uint16_t address, int clockCycles);  // Rotate left
+    int ROL_a(int clockCycles);  // Same as above but only grabs value from accumulator
+    int ROR(uint16_t address, int clockCycles);  // Rotate right
+    int ROR_a(int clockCycles);  // Same as above but only grabs value from accumulator
 
     /* Jumps and Calls */
     int JMP(uint16_t address, int clockCycles);  // Jump

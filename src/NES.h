@@ -13,8 +13,8 @@ public:
     NES();
     NES(CPUState &initialState);
 
-    uint8_t getMemoryValue(uint16_t address);
-    void setMemoryValue(uint16_t address, uint8_t value);
+    uint8_t memoryRead(uint16_t address);
+    void memoryWrite(uint16_t address, uint8_t value);
 
     void tickCPU();
 

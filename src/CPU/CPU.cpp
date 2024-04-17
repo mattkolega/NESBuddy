@@ -21,7 +21,7 @@ void CPU::connectToNes(NES *nes)
 
 void CPU::setToPowerUpState()
 {
-    pc = (nes->getMemoryValue(0xFFFD) << 8) | nes->getMemoryValue(0xFFFC);
+    pc = (nes->memoryRead(0xFFFD) << 8) | nes->memoryRead(0xFFFC);
     accumulator = 0;
     indexX = 0;
     indexY = 0;
@@ -51,47 +51,47 @@ CPUState CPU::getState()
 
 uint16_t CPU::getAbsoluteAddress()
 {
-    uint8_t byteOne = nes->memory[pc];
+    uint8_t byteOne = nes->memoryRead(pc);
     pc++;
-    uint8_t byteTwo = nes->memory[pc];
+    uint8_t byteTwo = nes->memoryRead(pc);
     pc++;
     return (byteTwo << 8) | byteOne;
 }   
 
 uint16_t CPU::getAbsoluteXAddress()
 {
-    uint8_t byteOne = nes->memory[pc];
+    uint8_t byteOne = nes->memoryRead(pc);
     pc++;
-    uint8_t byteTwo = nes->memory[pc];
+    uint8_t byteTwo = nes->memoryRead(pc);
     pc++;
     return ((byteTwo << 8) | byteOne) + indexX;
 }
 
 uint16_t CPU::getAbsoluteYAddress()
 {
-    uint8_t byteOne = nes->memory[pc];
+    uint8_t byteOne = nes->memoryRead(pc);
     pc++;
-    uint8_t byteTwo = nes->memory[pc];
+    uint8_t byteTwo = nes->memoryRead(pc);
     pc++;
     return ((byteTwo << 8) | byteOne) + indexY;
 }
 
 uint8_t CPU::getImmediateValue()
 {
-    uint8_t value = nes->memory[pc];
+    uint8_t value = nes->memoryRead(pc);
     pc++;
     return value;
 }
 
 uint16_t CPU::getIndirectAddress()
 {
-    uint8_t byteOne = nes->memory[pc];
+    uint8_t byteOne = nes->memoryRead(pc);
     pc++;
-    uint8_t byteTwo = nes->memory[pc];
+    uint8_t byteTwo = nes->memoryRead(pc);
     pc++;
 
     uint16_t absoluteAddress = (byteTwo << 8) | byteOne;
-    byteOne = nes->memory[absoluteAddress];
+    byteOne = nes->memoryRead(absoluteAddress);
 
     if ((absoluteAddress & 0x00FF) == 0xFF) {
         absoluteAddress &= 0xFF00;
@@ -99,55 +99,55 @@ uint16_t CPU::getIndirectAddress()
         absoluteAddress++;
     }
     
-    byteTwo = nes->memory[absoluteAddress];
+    byteTwo = nes->memoryRead(absoluteAddress);
     return (byteTwo << 8) | byteOne;
 }
 
 uint8_t CPU::getZeroPageAddress()
 {
-    uint8_t address = nes->memory[pc];
+    uint8_t address = nes->memoryRead(pc);
     pc++;
     return address;
 }
 
 uint8_t CPU::getZeroPageXAddress()
 {
-    uint8_t address = nes->memory[pc] + indexX;
+    uint8_t address = nes->memoryRead(pc) + indexX;
     pc++;
     return address;
 }
 
 uint8_t CPU::getZeroPageYAddress()
 {
-    uint8_t address = nes->memory[pc] + indexY;
+    uint8_t address = nes->memoryRead(pc) + indexY;
     pc++;
     return address;
 }
 
 uint16_t CPU::getIndexedIndirectAddress()
 {
-    uint8_t address = (nes->memory[pc] + indexX) & 0xFF;
+    uint8_t address = (nes->memoryRead(pc) + indexX) & 0xFF;
     pc++;
-    uint8_t byteOne = nes->memory[address];
+    uint8_t byteOne = nes->memoryRead(address);
     address++;
-    uint8_t byteTwo = nes->memory[address];
+    uint8_t byteTwo = nes->memoryRead(address);
     return (byteTwo << 8) | byteOne;
 }
 
 uint16_t CPU::getIndirectIndexedAddress()
 {
-    uint8_t address = nes->memory[pc];
+    uint8_t address = nes->memoryRead(pc);
     pc++;
-    uint8_t byteOne = nes->memory[address] + indexY;
-    int carry  = ((nes->memory[address] + indexY) > 255) ? 1 : 0; 
+    uint8_t byteOne = nes->memoryRead(address) + indexY;
+    int carry  = ((nes->memoryRead(address) + indexY) > 255) ? 1 : 0; 
     address++;
-    uint8_t byteTwo = nes->memory[address] + carry;
+    uint8_t byteTwo = nes->memoryRead(address) + carry;
     return (byteTwo << 8) | byteOne;
 }
 
 int8_t CPU::getRelativeOffset()
 {
-    int8_t offset = nes->memory[pc];
+    int8_t offset = nes->memoryRead(pc);
     pc++;
     return offset;
 }
@@ -171,12 +171,12 @@ void CPU::setZN(uint8_t value)
 
 void CPU::pushToStack(uint8_t value)
 {
-    nes->setMemoryValue(0x100 + sp, value);
+    nes->memoryWrite(0x100 + sp, value);
     sp--;
 }
 
 uint8_t CPU::popFromStack()
 {
     sp++;
-    return nes->getMemoryValue(0x100 + sp);
+    return nes->memoryRead(0x100 + sp);
 }
