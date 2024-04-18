@@ -1,9 +1,8 @@
 #include "Parser.h"
 
-#include <iostream>
-
 #include <nfd.hpp>
 
+#include "../Logger.h"
 #include "Mappers/Mapper000.h"
 
 namespace ROMParser 
@@ -22,10 +21,10 @@ namespace ROMParser
             nfdresult_t dialogResult = NFD::OpenDialog(outPath, filterItem, 1);
 
             if (dialogResult == NFD_CANCEL) {
-                std::cerr << "[ERROR]: File dialog was closed by user." << std::endl;
+                Logger::printWarning("File dialog was closed by user.");
                 return "";
             } else if (dialogResult != NFD_OKAY) {
-                std::cerr << "[ERROR]: " << NFD::GetError() << std::endl;
+                Logger::printError(NFD::GetError());
                 return "";
             }
 
@@ -147,12 +146,12 @@ namespace ROMParser
         std::optional<Cartridge> readFromNesFile(NESHeader &header, std::ifstream &romFile)
         {
             if (header.targetSystem != SystemType::nes) {
-                std::cerr << "[ERROR]: Unsupported console type is specified in ROM file." << std::endl;
+                Logger::printError("Unsupported console type is specified in ROM file.");
                 return std::nullopt;
             }
 
             if (header.defaultPeripheral == PeripheralType::unsupported) {
-                std::cerr << "[ERROR]: Unsupported peripheral type is specified in ROM file." << std::endl;
+                Logger::printError("Unsupported peripheral type is specified in ROM file.");
                 return std::nullopt;
             }
 
@@ -187,16 +186,6 @@ namespace ROMParser
             };
 
             return cartridge;
-
-            int mapperId;
-
-            switch (header.mapperId) {
-                case 0x00:
-                    mapperId = header.mapperId;
-                default:
-                    std::cerr << "[ERROR]: Unrecognised/unsupported mapper number in cartridge." << std::endl;
-                    return std::nullopt;
-            }
         }
     }
 
@@ -209,16 +198,18 @@ namespace ROMParser
         romFile.open(filepath, std::ios::binary | std::ios::in);
 
         if (!romFile) {
-            std::cerr << "[ERROR]: ROM file failed to open: " << filepath << std::endl;
+            Logger::printError("ROM file failed to open: " + filepath);
             return std::nullopt;
         }
+
+        Logger::printInfo("Loading .nes file: " + filepath);
 
         constexpr int headerSize = 16;
         std::array<uint8_t, headerSize> headerBytes;
 
         romFile.read(reinterpret_cast<char*>(headerBytes.data()), headerSize);
         if (romFile.fail()) {
-                std::cerr << "[ERROR]: Failure to read from ROM file: " << filepath << std::endl;
+                Logger::printError("Failure to read from ROM file: " + filepath);
                 return std::nullopt;
         }
 
@@ -233,7 +224,7 @@ namespace ROMParser
             header = ROMParser::parseNES20Header(headerBytes, romFile);
         }
         else if (fileFormat == FileFormat::invalid) {
-            std::cerr << "[ERROR]: Invalid file format. Please ensure ROM file is a valid .nes file." << std::endl;
+            Logger::printError("Invalid file format. Please ensure ROM file is a valid .nes file.");
             return std::nullopt;
         }
 

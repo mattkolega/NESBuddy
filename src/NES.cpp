@@ -1,12 +1,11 @@
 #include "NES.h"
 
-#include <iostream>
-
 #include "Cartridge/Parser.h"
 #include "Cartridge/Mappers/Mapper.h"
 #include "Cartridge/Mappers/Mapper000.h"
 #include "Cartridge/Mappers/NoMapper.h"
 #include "CPU/State.h"
+#include "Logger.h"
 
 NES::NES()
 {
@@ -23,7 +22,7 @@ NES::NES()
             mapper = std::make_unique<Mapper000>(cartridge);
             break;
         default:
-            std::cerr << "[ERROR]: Unrecognised/unsupported mapper number in cartridge." << std::endl;
+            Logger::printError("Unrecognised/unsupported mapper number in cartridge.");
             mapper = nullptr;
             break;
     }

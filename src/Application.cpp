@@ -1,12 +1,14 @@
 #include "Application.h"
 
-#include <iostream>
+#include <string>
+
+#include "Logger.h"
 
 Application::Application()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) 
     {
-        std::cerr << "FATAL ERROR: SDL could not be initialised! SDL_Error: " << SDL_GetError() << std::endl;
+        Logger::printError("SDL could not be initialised! SDL_Error: " + std::string(SDL_GetError()));
     }
 
     uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
@@ -15,21 +17,21 @@ Application::Application()
 
     if (window == NULL) 
     {
-        std::cerr << "FATAL ERROR: Window could not be created! SDL_Error: << " << SDL_GetError() << std::endl;
+        Logger::printError("Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     if (renderer == NULL) 
     {
-        std::cerr << "FATAL ERROR: Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
+        Logger::printError("Renderer could not be created! SDL_Error: " + std::string(SDL_GetError()));
     }
 
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     if (texture == NULL) 
     {
-        std::cerr << "FATAL ERROR: Screen Texture could not be created! SDL_Error: " << SDL_GetError() << std::endl;
+        Logger::printError("Screen Texture could not be created! SDL_Error: " + std::string(SDL_GetError()));
     }
 }
 
