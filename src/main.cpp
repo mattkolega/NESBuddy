@@ -1,21 +1,26 @@
 #include <SDL.h>
 
 #include "Application.h"
+#include "Logger.h"
 #include "NES.h"
 
 int main(int argc, char *argv[])
 {
-    Application application;
+    try {
+        Application application;
 
-    NES nes;
+        NES nes;
 
-    bool isRunning = true;
+        bool isRunning = true;
 
-    while (isRunning)
-    {
-        application.pollEvents(isRunning);
-        application.updateScreen();
+        while (isRunning) {
+            application.pollEvents(isRunning);
+            application.updateScreen();
+        }
+    } catch (std::exception const &e) {
+        Logger::printError(e.what());
+        return EXIT_FAILURE;
     }
-
-    return 0;
+    
+    return EXIT_SUCCESS;
 }

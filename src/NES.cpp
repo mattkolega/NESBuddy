@@ -1,5 +1,7 @@
 #include "NES.h"
 
+#include <stdexcept>
+
 #include "Cartridge/Parser.h"
 #include "Cartridge/Mappers/Mapper.h"
 #include "Cartridge/Mappers/Mapper000.h"
@@ -11,8 +13,13 @@ NES::NES()
 {
     std::optional<Cartridge> cart;
 
+    int fileOpenAttempts = 0;
+
     while (!cart.has_value()) {
         cart = ROMParser::openBinaryFile();
+        if (++fileOpenAttempts == 3) {
+            throw std::runtime_error("User has failed to provide .nes file.");
+        }
     }
 
     this->cartridge = cart.value();
