@@ -35,7 +35,7 @@ void testOpcode(std::string_view testFileName)
         // Set memory to initial values
         // ramItem[0] is the address and ramItem[1] is the value
         for (auto& ramItem : test["initial"]["ram"]) {
-            nes.memoryWrite(ramItem[address], ramItem[value]);
+            nes.cpuWrite(ramItem[address], ramItem[value]);
         }
 
         // Run CPU for the given instruction
@@ -61,8 +61,8 @@ void testOpcode(std::string_view testFileName)
         // Check if memory contents equal expected values
         for (auto& ramItem : test["final"]["ram"]) {
             expectedMem << "\tAddr: " << ramItem[address] << " Val: " << ramItem[value] << "\n";
-            actualMem << "\tAddr: " << ramItem[address] << " Val: " << +nes.memoryRead(ramItem[address]) << "\n";
-            if (ramItem[value] != nes.memoryRead(ramItem[address])) {
+            actualMem << "\tAddr: " << ramItem[address] << " Val: " << +nes.cpuRead(ramItem[address]) << "\n";
+            if (ramItem[value] != nes.cpuRead(ramItem[address])) {
                 ramMatch = false;
             }
         }

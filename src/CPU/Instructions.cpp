@@ -29,19 +29,19 @@ int CPU::LDY(uint8_t value, int clockCycles)
 
 int CPU::STA(uint16_t address, int clockCycles)
 {
-    nes->memoryWrite(address, accumulator);
+    nes->cpuWrite(address, accumulator);
     return clockCycles;
 }
 
 int CPU::STX(uint16_t address, int clockCycles)
 {
-    nes->memoryWrite(address, indexX);
+    nes->cpuWrite(address, indexX);
     return clockCycles;
 }
 
 int CPU::STY(uint16_t address, int clockCycles)
 {
-    nes->memoryWrite(address, indexY);
+    nes->cpuWrite(address, indexY);
     return clockCycles;
 }
 
@@ -248,8 +248,8 @@ int CPU::SBC(uint8_t value, int clockCycles)
 
 int CPU::DEC(uint16_t address, int clockCycles)
 {
-    nes->memoryWrite(address, nes->memoryRead(address)-1);
-    setZN(nes->memoryRead(address));
+    nes->cpuWrite(address, nes->cpuRead(address)-1);
+    setZN(nes->cpuRead(address));
     return clockCycles;
 }
 
@@ -269,8 +269,8 @@ int CPU::DEY(int clockCycles)
 
 int CPU::INC(uint16_t address, int clockCycles)
 {   
-    nes->memoryWrite(address, nes->memoryRead(address)+1);
-    setZN(nes->memoryRead(address));
+    nes->cpuWrite(address, nes->cpuRead(address)+1);
+    setZN(nes->cpuRead(address));
     return clockCycles;
 }
 
@@ -294,7 +294,7 @@ int CPU::INY(int clockCycles)
 
 int CPU::ASL(uint16_t address, int clockCycles)
 {
-    uint8_t value = nes->memoryRead(address);
+    uint8_t value = nes->cpuRead(address);
 
     const bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
@@ -308,7 +308,7 @@ int CPU::ASL(uint16_t address, int clockCycles)
 
     setZN(value);
 
-    nes->memoryWrite(address, value);
+    nes->cpuWrite(address, value);
 
     return clockCycles;
 }
@@ -332,7 +332,7 @@ int CPU::ASL_a(int clockCycles)
 
 int CPU::LSR(uint16_t address, int clockCycles)
 {
-    uint8_t value = nes->memoryRead(address);
+    uint8_t value = nes->cpuRead(address);
 
     const bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
@@ -346,7 +346,7 @@ int CPU::LSR(uint16_t address, int clockCycles)
 
     setZN(value);
 
-    nes->memoryWrite(address, value);
+    nes->cpuWrite(address, value);
 
     return clockCycles;
 }
@@ -370,7 +370,7 @@ int CPU::LSR_a(int clockCycles)
 
 int CPU::ROL(uint16_t address, int clockCycles)
 {
-    uint8_t value = nes->memoryRead(address);
+    uint8_t value = nes->cpuRead(address);
     
     const bool carry = (value >> 7) == 1;  // Test bit 7 of input value
 
@@ -385,7 +385,7 @@ int CPU::ROL(uint16_t address, int clockCycles)
 
     setZN(value);
 
-    nes->memoryWrite(address, value);
+    nes->cpuWrite(address, value);
 
     return clockCycles;
 }
@@ -410,7 +410,7 @@ int CPU::ROL_a(int clockCycles)
 
 int CPU::ROR(uint16_t address, int clockCycles)
 {
-    uint8_t value = nes->memoryRead(address);
+    uint8_t value = nes->cpuRead(address);
     
     const bool carry = (value & 0x01) == 1;  // Test bit 0 of input value
 
@@ -425,7 +425,7 @@ int CPU::ROR(uint16_t address, int clockCycles)
 
     setZN(value);
 
-    nes->memoryWrite(address, value);
+    nes->cpuWrite(address, value);
 
     return clockCycles;
 }
@@ -664,8 +664,8 @@ int CPU::BRK(int clockCycles)
     processorStatus.reset(static_cast<uint8_t>(Flags::breakCommand));
     processorStatus.set(static_cast<uint8_t>(Flags::interruptDisable));
     
-    const uint8_t lowByte = nes->memoryRead(0xFFFE);
-    const uint8_t highByte = nes->memoryRead(0xFFFF);
+    const uint8_t lowByte = nes->cpuRead(0xFFFE);
+    const uint8_t highByte = nes->cpuRead(0xFFFF);
 
     pc = (highByte << 8) | lowByte; 
 

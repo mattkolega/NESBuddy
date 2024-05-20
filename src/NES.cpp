@@ -50,7 +50,7 @@ NES::NES(CPUState &initialState) : cpu(initialState)
     cpu.connectToNes(this);
 }
 
-uint8_t NES::memoryRead(uint16_t address)
+uint8_t NES::cpuRead(uint16_t address)
 {
     if (address >= 0x0 && address <= 0x7FFF) {
         return memory[address];
@@ -59,7 +59,7 @@ uint8_t NES::memoryRead(uint16_t address)
     }
 }
 
-void NES::memoryWrite(uint16_t address, uint8_t value)
+void NES::cpuWrite(uint16_t address, uint8_t value)
 {
     if (address >= 0x0 && address <= 0x7FFF) {
         memory[address] = value;
