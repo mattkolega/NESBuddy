@@ -11,6 +11,8 @@ class Mapper
 public:
     Mapper(Cartridge &cart);
 
+    virtual uint8_t chrRead(uint16_t address) = 0;
+    virtual void chrWrite(uint16_t address, uint8_t value) = 0;
     virtual uint8_t prgRead(uint16_t address) = 0;
     virtual void prgWrite(uint16_t address, uint8_t value) = 0;
 
