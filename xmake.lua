@@ -22,7 +22,7 @@ target("nesbuddy")
         "libsdl", 
         "nativefiledialog-extended"
     )
-    if is_mode("debug") then
+    if is_plat("windows") and is_mode("debug") then
         add_ldflags("/subsystem:console")  -- Needed for stdout and stderr to console 
     end
 
