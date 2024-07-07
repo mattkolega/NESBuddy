@@ -1,6 +1,7 @@
 #include "Application.h"
 
-#include <string>
+#include <iostream>
+#include <vector>
 
 #include "Logger.h"
 
@@ -11,61 +12,98 @@ Application::Application()
         Logger::printError("SDL could not be initialised! SDL_Error: " + std::string(SDL_GetError()));
     }
 
-    uint32_t windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
-
-    window = SDL_CreateWindow("NESBuddy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, windowFlags);
-
-    if (window == NULL) 
-    {
-        Logger::printError("Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
-    }
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    if (renderer == NULL) 
-    {
-        Logger::printError("Renderer could not be created! SDL_Error: " + std::string(SDL_GetError()));
-    }
-
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    if (texture == NULL) 
-    {
-        Logger::printError("Screen Texture could not be created! SDL_Error: " + std::string(SDL_GetError()));
-    }
+    windows.emplace("main", std::make_unique<Window>("NESBuddy", GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT, true));
 }
 
 Application::~Application()
 {
-    SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-
     SDL_Quit();
 }
 
-void Application::pollEvents(bool &isRunning)
+void Application::pollEvents(bool& isRunning)
 {
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-            case SDL_QUIT:
-                isRunning = false;
-                break;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            isRunning = false;
         }
+
+        Application::handleWindowEvents(event, isRunning);
     }
 }
 
-void Application::updateScreen()
+void Application::handleWindowEvents(SDL_Event& event, bool& isRunning)
 {
-    // Render to texture
-    SDL_SetRenderTarget(renderer, texture);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    for (auto& [name, window] : windows) {
+        window->handleEvents(event, isRunning);
+    }
+}
 
-    // Render to window
-    SDL_SetRenderTarget(renderer, NULL);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
+void Application::updateWindows()
+{
+    for (auto& [name, window] : windows) {
+        window->updateScreen();
+    }
+}
+
+void Application::queuePatternTableTileDrawing(const PatternTableTiles& tiles, std::string windowName)
+{
+    static std::vector<SDL_Rect> black;
+    static std::vector<SDL_Rect> darkGrey;
+    static std::vector<SDL_Rect> grey;
+    static std::vector<SDL_Rect> white;
+
+    int startingY = 0;
+    int startingX = 0;
+
+    if (black.size() > 0) {  // Skip filling vectors if already filled
+        windows[windowName]->addToDrawQueue(black,    {0x00, 0x00, 0x00, 255});
+        windows[windowName]->addToDrawQueue(grey,     {0x59, 0x59, 0x59, 255});
+        windows[windowName]->addToDrawQueue(darkGrey, {0xA6, 0xA6, 0xA6, 255});
+        windows[windowName]->addToDrawQueue(white,    {0xFF, 0xFF, 0xFF, 255});
+        return;
+    }
+
+    for (int tile = 0; tile < 512; tile++) {
+        if ((tile % 16) == 0 || tile == 0) {
+            startingX = 0;
+        } else {
+            startingX += 16;  // Move to next column of tiles
+        }
+
+        for (int row = 0; row < 8; row++) {
+            for (int column = 0; column < 8; column++) {
+                SDL_Rect rect;
+                rect.h = 2;
+                rect.w = 2;
+                rect.x = startingX + 2*column;
+                rect.y = startingY + 2*row;
+
+                switch (tiles[tile][row][column]) {
+                    case 0:
+                        black.push_back(rect);
+                        break;
+                    case 1:
+                        darkGrey.push_back(rect);
+                        break;
+                    case 2:
+                        grey.push_back(rect);
+                        break;
+                    case 3:
+                        white.push_back(rect);
+                        break;
+                    default:
+                        break;
+                };
+            }
+        }
+
+        if ((tile % 16) == 0 && tile != 0) {
+            startingY += 16; // Move to next row of tiles
+        }
+    }
+
+    windows[windowName]->addToDrawQueue(black,    {0x00, 0x00, 0x00, 255});
+    windows[windowName]->addToDrawQueue(grey,     {0x59, 0x59, 0x59, 255});
+    windows[windowName]->addToDrawQueue(darkGrey, {0xA6, 0xA6, 0xA6, 255});
+    windows[windowName]->addToDrawQueue(white,    {0xFF, 0xFF, 0xFF, 255});
 }
